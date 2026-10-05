@@ -1,0 +1,39 @@
+---
+// 标签索引:胶囊墙。
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icon.astro";
+import { withBase } from "../../lib/base";
+import type { Tag } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const tags = (await pb.collection("tags").getFullList<Tag>().catch(() => [])) as Tag[];
+---
+
+<BaseLayout title="标签" path="/tags">
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <h1 class="dc-page-title">
+        <Icon name="tag" size={26} />
+        标签
+      </h1>
+    </div>
+
+    {
+      tags.length === 0 ? (
+        <div class="dc-card dc-card--lg" style="margin-top:20px">
+          <div class="dc-empty">暂无标签。</div>
+        </div>
+      ) : (
+        <div class="dc-chipwall">
+          {tags.map((t) => (
+            <a href={withBase(`/tags/${t.id}`)}>
+              #{t.name}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

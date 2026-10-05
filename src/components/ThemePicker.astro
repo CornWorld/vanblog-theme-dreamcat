@@ -1,0 +1,236 @@
+---
+// 主题配色切换器(v3 dreamcat-theme-dialog 交互形态,机制走平台调色盘):
+// - 主色调(19)/ 模式(亮/暗/跟随系统)→ setPalette 到 dreamcat-<key>[-dark]
+//   / system 伪调色盘,link 热交换 + html.dark 翻转全按平台语义;
+// - 强调色(16)→ 平台无第二个强调槽,落主题层 --dc-pink(存
+//   localStorage 'dreamcat-theme-settings.accent',对齐 v2 存储键);
+// - 文字/图标颜色按 WCAG 相对亮度实时计算,不依赖查表。
+import Icon from "./Icon.astro";
+import { PRIMARY_COLORS, ACCENT_COLORS } from "../lib/mduiColors.mjs";
+
+interface Props {
+  /** 平台调色盘名 → light|dark(供运行时翻转 html.dark) */
+  paletteTypes: Record<string, string>;
+  /** 站点当前调色盘(system 伪调色盘时的配色来源) */
+  sitePalette: string;
+  /** 站点更新时间(palette.css 缓存失效参数,对齐平台 paletteCssUrl) */
+  siteUpdated?: string;
+}
+
+const { paletteTypes, sitePalette, siteUpdated } = Astro.props;
+const primaryNames = Object.keys(PRIMARY_COLORS);
+const accentNames = Object.keys(ACCENT_COLORS);
+---
+
+<button class="dc-theme-fab dc-ripple" id="dc-theme-btn" title="主题配色" aria-label="打开主题配色">
+  <Icon name="palette" size={22} />
+</button>
+
+<div class="mdui-dialog dc-theme-dialog" id="dc-theme-dialog">
+  <div class="dc-dialog-head">
+    主题配色
+    <button class="dc-dialog__close" mdui-dialog-close aria-label="关闭">
+      <Icon name="close" size={20} />
+    </button>
+  </div>
+  <div class="mdui-dialog-content">
+      <div class="dc-theme-section-title">主色调</div>
+      <div class="dc-theme-options" id="dc-theme-primary">
+        {primaryNames.map((name) => (
+          <button class="dc-theme-option" data-dc-color={name}>
+            <span class="dc-theme-dot" style={`background:${PRIMARY_COLORS[name].c500}`} />
+            <span>{name}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="dc-theme-section-title">强调色</div>
+      <div class="dc-theme-options" id="dc-theme-accent">
+        {accentNames.map((name) => (
+          <button class="dc-theme-option" data-dc-accent={name}>
+            <span class="dc-theme-dot" style={`background:${ACCENT_COLORS[name]}`} />
+            <span>{name}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="dc-theme-section-title">模式</div>
+      <div class="dc-theme-options dc-theme-options-compact" id="dc-theme-mode">
+        <button class="dc-theme-option" data-dc-mode="light"><span>☀️ 亮色</span></button>
+        <button class="dc-theme-option" data-dc-mode="dark"><span>🌙 暗色</span></button>
+        <button class="dc-theme-option" data-dc-mode="system"><span>🔄 跟随系统</span></button>
+      </div>
+
+      <div class="dc-theme-actions">
+        <button class="dc-btn dc-btn--ghost" id="dc-theme-reset">恢复默认</button>
+      </div>
+    </div>
+</div>
+
+<script is:inline define:vars={{ paletteTypes, sitePalette, siteUpdated, accentMap: ACCENT_COLORS, colorHexes: Object.fromEntries(Object.entries(PRIMARY_COLORS).flatMap(([k, c]) => [[k, c.c500]])) }}>
+  (() => {
+    // ── 与平台 SDK 相同语义的最小实现(is:inline 不能 import) ──
+    const PALETTE_KEY = "vanblog-palette";
+    const ACCENT_KEY = "dreamcat-theme-settings";
+    const store = {
+      get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+      set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+      del(k) { try { localStorage.removeItem(k); } catch {} },
+    };
+    const accent = () => {
+      try { return (JSON.parse(store.get(ACCENT_KEY) || "{}") || {}).accent || null; }
+      catch { return null; }
+    };
+
+    // 当前生效调色盘名(未锁定/跟随系统时,配色来自站点配置)
+    const currentPalette = () => {
+      const p = store.get(PALETTE_KEY);
+      if (!p || p === "default" || p === "system") return sitePalette || "dreamcat";
+      return p;
+    };
+    const parseName = (name) => {
+      const dark = name.endsWith("-dark");
+      const base = name.replace(/-dark$/, "");
+      const key = base.startsWith("dreamcat-") ? base.slice(9) : "indigo";
+      return { key, dark };
+    };
+    const buildName = (key, dark) => {
+      if (key === "indigo") return dark ? "dreamcat-dark" : "dreamcat";
+      return "dreamcat-" + key + (dark ? "-dark" : "");
+    };
+
+    // WCAG 相对亮度 → 浅底深字
+    const lum = (hex) => {
+      const m = hex.replace("#", "").padEnd(6, "0").slice(0, 6);
+      const num = parseInt(m, 16);
+      if (isNaN(num)) return 0;
+      const lin = (c) => { const s = c / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+      return 0.2126 * lin((num >> 16) & 255) + 0.7152 * lin((num >> 8) & 255) + 0.0722 * lin(num & 255);
+    };
+    const onColor = (hex) => (lum(hex) >= 0.5 ? "#212121" : "#ffffff");
+
+    // 调色盘热交换(平台 init 同语义):换 link + 翻 dark + 通知监听方
+    const setPalette = (name) => {
+      if (name === "system") {
+        store.set(PALETTE_KEY, "system");
+        const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+        applyDark(dark);
+        return dark;
+      }
+      store.set(PALETTE_KEY, name);
+      return applyDark(paletteTypes[name] === "dark");
+    };
+    const applyDark = (dark) => {
+      const link = document.querySelector("link[data-vanblog-palette]");
+      if (link) {
+        const pal = currentPalette();
+        // 站点更新时间作缓存失效参数(对齐平台 paletteCssUrl 语义)
+        const v = siteUpdated ? "&v=" + encodeURIComponent(siteUpdated) : "";
+        link.href = "/api/palette.css?name=" + encodeURIComponent(pal) + v;
+      }
+      document.documentElement.classList.toggle("dark", dark);
+      document.documentElement.dispatchEvent(
+        new CustomEvent("darkmodechange", { detail: { dark } }),
+      );
+      return dark;
+    };
+
+    // 应用强调色(--dc-pink 主题层)+ 其上的图标颜色
+    const applyAccent = () => {
+      const a = accent();
+      const root = document.documentElement;
+      if (a && accentMap[a]) {
+        root.style.setProperty("--dc-pink", accentMap[a]);
+        root.style.setProperty("--dc-on-accent", onColor(accentMap[a]));
+      } else {
+        root.style.removeProperty("--dc-pink");
+        root.style.removeProperty("--dc-on-accent");
+      }
+    };
+
+    // 弹窗选项高亮
+    const syncActive = () => {
+      const cur = currentPalette();
+      const { key, dark } = parseName(cur);
+      const mode = store.get(PALETTE_KEY) === "system" ? "system" : dark ? "dark" : "light";
+      document.querySelectorAll("[data-dc-color]").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.dcColor === key);
+      });
+      document.querySelectorAll("[data-dc-accent]").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.dcAccent === accent());
+      });
+      document.querySelectorAll("[data-dc-mode]").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.dcMode === mode);
+      });
+    };
+
+    // ── 交互(弹层 = mdui.Dialog,由 BaseLayout 挂到 window.mdui) ──
+    const dialogEl = document.getElementById("dc-theme-dialog");
+    let dialog = null;
+    const open = () => {
+      if (!dialogEl) return;
+      // mdui.Dialog 由 BaseLayout 的 module script 挂到 window(时序晚于本内联脚本,
+      // 但 open 只在用户点击后发生)
+      if (!dialog && window.mdui) {
+        dialog = new window.mdui.Dialog(dialogEl, { history: false });
+      }
+      dialog ? dialog.open() : dialogEl.classList.add("mdui-dialog-open");
+      syncActive();
+    };
+    // 关闭按钮带 mdui-dialog-close 属性由 mdui 自动绑定;esc/遮罩点击亦由 mdui 处理
+    document.getElementById("dc-theme-btn")?.addEventListener("click", open);
+
+    document.querySelectorAll("[data-dc-color]").forEach((el) => {
+      el.addEventListener("click", () => {
+        // 跟随系统模式下选主色:按 OS 明暗挑对应变体
+        const dark =
+          store.get(PALETTE_KEY) === "system"
+            ? matchMedia("(prefers-color-scheme: dark)").matches
+            : parseName(currentPalette()).dark;
+        setPalette(buildName(el.dataset.dcColor, dark));
+        syncActive();
+      });
+    });
+    document.querySelectorAll("[data-dc-mode]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const mode = el.dataset.dcMode;
+        if (mode === "system") {
+          setPalette("system");
+        } else {
+          const { key } = parseName(currentPalette());
+          setPalette(buildName(key, mode === "dark"));
+        }
+        syncActive();
+      });
+    });
+    document.querySelectorAll("[data-dc-accent]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const a = el.dataset.dcAccent;
+        try {
+          const s = JSON.parse(store.get(ACCENT_KEY) || "{}") || {};
+          s.accent = a;
+          store.set(ACCENT_KEY, JSON.stringify(s));
+        } catch {
+          store.set(ACCENT_KEY, JSON.stringify({ accent: a }));
+        }
+        applyAccent();
+        syncActive();
+      });
+    });
+    document.getElementById("dc-theme-reset")?.addEventListener("click", () => {
+      store.del(ACCENT_KEY);
+      store.del(PALETTE_KEY);
+      applyDark(paletteTypes[sitePalette] === "dark");
+      applyAccent();
+      syncActive();
+    });
+
+    // 系统明暗变化时,system 模式跟随
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if (store.get(PALETTE_KEY) === "system") applyDark(matchMedia("(prefers-color-scheme: dark)").matches);
+    });
+
+    applyAccent();
+    void colorHexes;
+  })();
+</script>

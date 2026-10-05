@@ -1,0 +1,54 @@
+---
+// 时间轴(2.x timershaft 的移植):中轴线 + 左右交错卡片 + 圆点。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import { withBase, articlePath } from "../lib/base";
+import type { TimelineEntry } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const entries = (await pb.vanblog.timeline.list().catch(() => [])) as TimelineEntry[];
+---
+
+<BaseLayout title="时间轴" path="/timeline">
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <h1 class="dc-page-title">
+        <Icon name="schedule" size={26} />
+        时间轴
+      </h1>
+    </div>
+
+    {
+      entries.length === 0 ? (
+        <div class="dc-card dc-card--lg" style="margin-top:20px">
+          <div class="dc-empty">暂无数据。</div>
+        </div>
+      ) : (
+        <div class="dc-timeline">
+          {entries.map((year) => (
+            <>
+              <div class="dc-timeline__year">
+                {year.year}
+                <small style="opacity:.75;font-size:13px">({year.count})</small>
+              </div>
+              {year.months.map((m) =>
+                m.titles.map((t) => (
+                  <div class="dc-card dc-card--hover dc-timeline__item">
+                    <span class="dc-timeline__date">
+                      {year.year}.{String(m.month).padStart(2, "0")}
+                    </span>
+                    <a class="dc-timeline__link" href={withBase(`/posts/${articlePath(t.pathname, t.id)}`)}>
+                      {t.title}
+                    </a>
+                  </div>
+                )),
+              )}
+            </>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

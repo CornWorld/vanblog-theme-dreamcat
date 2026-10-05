@@ -1,0 +1,78 @@
+---
+// 文章目录(3.x 阅读增强移植):服务端渲染目录树,
+// 客户端做滚动跟随;≥1500px 浮动面板,窄屏 FAB + 弹层(替代 mdui.dialog)。
+import Icon from "./Icon.astro";
+import type { TocItem } from "../lib/toc";
+
+interface Props {
+  items: TocItem[];
+}
+
+const { items } = Astro.props;
+const minLevel = Math.min(...items.map((i) => i.level));
+---
+
+{
+  items.length >= 2 && (
+    <>
+      <aside class="dc-toc" id="dc-toc-panel" aria-label="目录">
+        <div class="dc-toc__title">目录</div>
+        <ul>
+          {items.map((item) => (
+            <li style={`margin-left:${(item.level - minLevel) * 14}px`}>
+              <a href={`#${item.id}`}>{item.text}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+      <button class="dc-fab dc-fab--toc" id="dc-toc-fab" title="目录" aria-label="打开目录">
+        <Icon name="list" size={22} />
+      </button>
+    </>
+  )
+}
+
+<script define:vars={{ tocIds: items.map((i) => i.id) }}>
+  // 滚动跟随:命中当前标题高亮(3.x setupScrollSpy 移植,面板 + 弹层联动)
+  (() => {
+    const headings = tocIds.map((id) => document.getElementById(id)).filter(Boolean);
+    const panelLinks = new Map(
+      [...document.querySelectorAll('#dc-toc-panel a')].map((a) => [a.getAttribute("href").slice(1), a]),
+    );
+    if (headings.length < 2) return;
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const fromTop = window.scrollY + 120;
+      let current = headings[0];
+      for (const h of headings) {
+        if (h.offsetTop <= fromTop) current = h;
+        else break;
+      }
+      panelLinks.forEach((link, id) => link.classList.toggle("is-active", id === current.id));
+    };
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+    update();
+
+    // 窄屏弹层:mdui.dialog 工厂(window.mdui 由 BaseLayout 挂载)
+    const buildDialog = () => {
+      const panel = document.getElementById("dc-toc-panel");
+      if (!panel) return;
+      const list = panel.querySelector("ul");
+      if (!list || !window.mdui) return;
+      window.mdui.dialog({
+        title: "目录",
+        content: `<div class="dc-toc-dialog">${list.outerHTML}</div>`,
+        buttons: [{ text: "关闭" }],
+        history: false,
+      });
+    };
+    document.getElementById("dc-toc-fab")?.addEventListener("click", buildDialog);
+  })();
+</script>

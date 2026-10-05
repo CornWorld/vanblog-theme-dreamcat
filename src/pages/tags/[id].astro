@@ -1,0 +1,62 @@
+---
+// 标签详情:该标签下的文章。
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icon.astro";
+import PostCard from "../../components/PostCard.astro";
+import Pagination from "../../components/Pagination.astro";
+import { getPage } from "@vanblog/sdk";
+import { withBase } from "../../lib/base";
+import type { Tag, PostExpand } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/404");
+let tag: Tag;
+try {
+  tag = await pb.collection("tags").getOne<Tag>(id);
+} catch {
+  return Astro.redirect("/404");
+}
+
+const params = Astro.url.searchParams;
+const page = getPage(params);
+const result = await pb.vanblog.posts
+  .listPublished(page, 10, { tag: tag.name, sort: "-created" })
+  .catch(() => null);
+const posts = (result?.items ?? []) as PostExpand[];
+const totalPages = result?.totalPages ?? 1;
+---
+
+<BaseLayout title={`标签: ${tag.name}`} path={`/tags/${id}`}>
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <p style="margin:0 0 4px">
+        <a href={withBase("/tags")} style="color:var(--dc-text-muted);font-size:13px">
+          ← 所有标签
+        </a>
+      </p>
+      <h1 class="dc-page-title">
+        <Icon name="tag" size={26} />
+        #{tag.name}
+      </h1>
+      {tag.description && <p class="dc-page-desc">{tag.description}</p>}
+    </div>
+
+    {
+      posts.length === 0 ? (
+        <div class="dc-card dc-card--lg" style="margin-top:20px">
+          <div class="dc-empty">该标签下暂无文章。</div>
+        </div>
+      ) : (
+        <div class="dc-post-list">
+          {posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      )
+    }
+    <Pagination base={`/tags/${id}`} params={params} page={page} totalPages={totalPages} />
+  </div>
+</BaseLayout>

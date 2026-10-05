@@ -1,0 +1,39 @@
+---
+// 分类索引:胶囊墙。
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icon.astro";
+import { withBase } from "../../lib/base";
+import type { Category } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const categories = (await pb.collection("categories").getFullList<Category>().catch(() => [])) as Category[];
+---
+
+<BaseLayout title="分类" path="/categories">
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <h1 class="dc-page-title">
+        <Icon name="folder" size={26} />
+        分类
+      </h1>
+    </div>
+
+    {
+      categories.length === 0 ? (
+        <div class="dc-card dc-card--lg" style="margin-top:20px">
+          <div class="dc-empty">暂无分类。</div>
+        </div>
+      ) : (
+        <div class="dc-chipwall">
+          {categories.map((c) => (
+            <a href={withBase(`/categories/${c.id}`)}>
+              {c.name}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

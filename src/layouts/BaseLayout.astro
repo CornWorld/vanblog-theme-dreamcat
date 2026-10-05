@@ -1,0 +1,310 @@
+---
+// DreamCat BaseLayout:抽屉 + 主区 + 页脚的完整外壳(独立于平台 base 布局)。
+// 承接平台契约:palette 注入 / 主题初始化脚本(FOUC 防抖)/ Pack 前端注入 /
+// 站点级自定义代码(customHead/customCss/customScript/customHtml)。
+// 交互行为层: mdui-lite 裁剪 fork(drawer/dialog/snackbar/ripple)。
+// 其结构样式须先于主题皮肤加载,dc-* 在其上做品牌视觉。
+import "@vanblog/mdui-lite/dist/mdui-lite.css";
+import "../styles/global.css";
+// KaTeX CSS — 隐藏 rehype-katex 在视觉 HTML 旁输出的 MathML aria-hidden 副本,
+// 缺了它含公式的文章会显示两份数学式。正文在服务端渲染,故全局加载。
+import "katex/dist/katex.css";
+import {
+  safe,
+  stripMarkdown,
+  buildThemeInitScript,
+  buildPaletteTypeMap,
+  paletteCssUrl,
+  postMetaString,
+} from "@vanblog/sdk";
+import { getPackFrontend } from "@vanblog/base/lib/pack-frontend";
+import type { Site, Post, Category } from "@vanblog/sdk";
+import themeMeta from "../../theme.json";
+
+import Drawer from "../components/Drawer.astro";
+import Footer from "../components/Footer.astro";
+import Icon from "../components/Icon.astro";
+import ThemePicker from "../components/ThemePicker.astro";
+import { withBase } from "../lib/base";
+import { ACCENT_COLORS } from "../lib/mduiColors.mjs";
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  site?: Partial<Site>;
+  post?: Post;
+  path?: string;
+}
+
+const { title = "", description, keywords, site: siteProp, post, path } = Astro.props;
+const pb = Astro.locals.pb;
+const site = siteProp || (await Astro.locals.getSite());
+
+const siteName = site?.siteName || "DreamCat";
+const siteDesc = site?.siteDesc || "";
+const baseUrl = site?.baseUrl || "";
+const pageTitle = title ? `${title} - ${siteName}` : siteName;
+const canonicalURL = baseUrl && path ? `${baseUrl.replace(/\/$/, "")}${path}` : undefined;
+const desc = description || (post ? stripMarkdown(post.content) || siteDesc : siteDesc);
+const ogImage = postMetaString(post?.meta, "cover", "image", "ogImage");
+
+// Pack 前端注入(nav / styles / scripts),请求时解析,装 pack 免重建主题。
+const packFrontend = await getPackFrontend(pb);
+
+// 主题设置(theme.json settings;服务端已合并默认值,值是 JSON 原始类型)。
+const themeSettings = await Astro.locals.getThemeSettings();
+const sStr = (key: string) => (typeof themeSettings[key] === "string" ? (themeSettings[key] as string).trim() : "");
+const sBool = (key: string, fallback = true) =>
+  typeof themeSettings[key] === "boolean" ? (themeSettings[key] as boolean) : fallback;
+const drawerBgUrl = sStr("drawerBgUrl");
+const footerText = sStr("footerText");
+const showBackToTop = sBool("showBackToTop");
+const showThemePicker = sBool("showThemePicker");
+const fontFamily = sStr("fontFamily") || "jetbrains-mono";
+const fontKey = ["jetbrains-mono", "smiley", "system"].includes(fontFamily)
+  ? `dc-font-${fontFamily}`
+  : "dc-font-jetbrains";
+
+// 调色盘:站点 palette 优先,否则主题推荐色;type 决定 html.dark。
+const recommendedPalette = (themeMeta as { recommendedPalette?: string })?.recommendedPalette || null;
+const effectivePalette = site?.palette || recommendedPalette;
+const palettes = await safe(() => pb.vanblog.palettes.list(), "palettes");
+const paletteTypeMap = buildPaletteTypeMap(palettes.data ?? []);
+
+// 抽屉数据:分类 + 文章数。计数走平台 listPublished 的 totalItems,
+// 可见性规则(status/deleted/private)由平台封装,不在主题里复写过滤条件。
+const categories = await safe(
+  () => pb.collection("categories").getFullList<Category>({ sort: "created" }),
+  "drawer-categories",
+);
+const countResult = await safe(() => pb.vanblog.posts.listPublished(1, 1), "drawer-count");
+const postCount = countResult.data?.totalItems ?? 0;
+
+// Pack 注册的导航项(/p/<name>,服务器归一)与展示开关(平台 displayOptions)。
+const packNavItems = packFrontend.packs.flatMap((p) => (p.nav ? [p.nav] : []));
+const showAdminButton = site?.displayOptions?.showAdminButton !== false;
+const showRSS = site?.displayOptions?.showRSS !== false;
+
+const currentPath = new URL(Astro.request.url).pathname.replace(/^\/themes\/[^/]+/, "") || "/";
+
+// JSON-LD(转义 `<` 防 </script> 逃逸)。
+const safeJsonLd = (obj: unknown) => JSON.stringify(obj).replace(/</g, "\\u003c");
+const articleSchema = post
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: post.title,
+      datePublished: post.created,
+      dateModified: post.updated,
+      author: site?.author ? { "@type": "Person", name: site.author } : undefined,
+      publisher: { "@type": "Organization", name: siteName },
+      description: desc,
+      mainEntityOfPage: canonicalURL ? { "@type": "WebPage", "@id": canonicalURL } : undefined,
+    }
+  : null;
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  description: siteDesc,
+  url: baseUrl || undefined,
+};
+---
+
+<!doctype html>
+<html lang="zh-CN" class={fontKey}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- 访客强调色预绘制:主色调/明暗由平台调色盘机制管(vanblog-palette,
+         其后的平台 init 脚本负责 link 交换与 html.dark),这里只把主题层的
+         --dc-pink 及其上的图标色在首帧前落位(存 v2 兼容键 accent 字段)。 -->
+    <script is:inline define:vars={{ accentMap: ACCENT_COLORS }}>
+      (() => {
+        try {
+          const s = JSON.parse(localStorage.getItem("dreamcat-theme-settings") || "{}") || {};
+          if (s.accent && accentMap[s.accent]) {
+            const hex = accentMap[s.accent];
+            const m = hex.replace("#", "").padEnd(6, "0").slice(0, 6);
+            const num = parseInt(m, 16);
+            const lin = (c) => { const v = c / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+            const L = 0.2126 * lin((num >> 16) & 255) + 0.7152 * lin((num >> 8) & 255) + 0.0722 * lin(num & 255);
+            const root = document.documentElement;
+            root.style.setProperty("--dc-pink", hex);
+            root.style.setProperty("--dc-on-accent", L >= 0.5 ? "#212121" : "#ffffff");
+          }
+        } catch {}
+      })();
+    </script>
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+
+    <!-- Palette CSS 必须在 FOUC 脚本之前(初始化脚本首帧前换 link href,顺序反了
+         会因 querySelector 落空而静默回落默认配色,与旗舰主题同注记)。 -->
+    {effectivePalette && (
+      <link rel="stylesheet" href={paletteCssUrl(effectivePalette, site?.updated)} data-vanblog-palette />
+    )}
+    <script is:inline set:html={buildThemeInitScript({
+      sitePalette: effectivePalette,
+      siteUpdated: site?.updated,
+      palettes: paletteTypeMap,
+    })} />
+
+    <link rel="icon" href={site?.favicon || `${__VANBLOG_THEME_PREFIX__}/favicon.svg`} type="image/svg+xml" />
+
+    <!-- OpenGraph / Twitter -->
+    <meta property="og:title" content={post?.title || title || siteName} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content={post ? "article" : "website"} />
+    {canonicalURL && <meta property="og:url" content={canonicalURL} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={post?.title || title || siteName} />
+    <meta name="twitter:description" content={desc} />
+
+    <!-- RSS 自动发现 -->
+    <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS`} href="/api/feed.xml" />
+    <link rel="alternate" type="application/atom+xml" title={`${siteName} Atom`} href="/api/atom.xml" />
+
+    {articleSchema && <script is:inline type="application/ld+json" set:html={safeJsonLd(articleSchema)} />}
+    <script is:inline type="application/ld+json" set:html={safeJsonLd(websiteSchema)} />
+
+    <!-- 站点分析(平台配置) -->
+    {site?.baiduAnalysisId && <script is:inline src={`https://hm.baidu.com/hm.js?${site.baiduAnalysisId}`} async />}
+    {site?.gaAnalysisId && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${site.gaAnalysisId}`} />
+        <script
+          is:inline
+          set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${site.gaAnalysisId}');`}
+        />
+      </>
+    )}
+
+    <!-- Pack 前端样式 + 站点级自定义注入(后台「自定义代码」) -->
+    {packFrontend.contributions.filter((i) => i.scope === "public").flatMap((i) => i.styles).map((href) => (
+      <link rel="stylesheet" href={href} data-vanblog-pack-style />
+    ))}
+    {site?.customHead && <Fragment set:html={site.customHead} />}
+    {site?.customCss && <style is:inline set:html={site.customCss} />}
+    {site?.customScript && <script is:inline set:html={site.customScript} />}
+  </head>
+
+  <body>
+    <div class="dc-shell">
+      <Drawer
+        site={site ?? {}}
+        drawerBgUrl={drawerBgUrl}
+        categories={categories.data ?? []}
+        postCount={postCount}
+        currentPath={currentPath}
+        packNavItems={packNavItems}
+        showAdminButton={showAdminButton}
+        showRSS={showRSS}
+      />
+
+      <div class="dc-main">
+        <!-- 窄屏顶栏 -->
+        <div class="dc-toolbar">
+          <button class="dc-icon-btn" id="dc-menu-btn" aria-label="打开菜单">
+            <Icon name="menu" size={22} />
+          </button>
+          <div class="dc-toolbar-title">{title || siteName}</div>
+          <a class="dc-icon-btn" href={withBase("/search")} aria-label="搜索">
+            <Icon name="search" size={20} />
+          </a>
+        </div>
+
+        <div class="dc-content">
+          <slot />
+        </div>
+
+        <Footer site={site ?? {}} footerText={footerText} />
+      </div>
+    </div>
+
+    {showBackToTop && (
+      <button class="dc-fab dc-fab--surface dc-ripple" id="dc-back-top" style="display:none" title="回到顶部" aria-label="回到顶部">
+        <Icon name="arrowUp" size={22} />
+      </button>
+    )}
+
+    {showThemePicker && (
+      <ThemePicker paletteTypes={paletteTypeMap} sitePalette={effectivePalette || "dreamcat"} siteUpdated={site?.updated} />
+    )}
+
+    <!-- Pack 前端脚本 + 站点自定义 HTML(底部) -->
+    {packFrontend.contributions.filter((i) => i.scope === "public").flatMap((i) => i.scripts).map((src) => (
+      <script is:inline type="module" src={src} data-vanblog-pack-script></script>
+    ))}
+    {site?.customHtml && <Fragment set:html={site.customHtml} />}
+
+    <script>
+      // 交互行为层 = mdui-lite(裁剪 fork):Drawer/Snackbar/Ripple。
+      // 主题保留的 window.dcSnackbar 是给内联脚本(回顶彩蛋等)的稳定入口。
+      import mdui from "@vanblog/mdui-lite";
+
+      window.mdui = mdui;
+
+      // 波纹覆盖面:mdui ripple 在 document 级按 .mdui-ripple 类委托,
+      // 这里把主题交互元素统一补挂该类(含后渲染的元素,load 后再跑一次)。
+      const RIPPLE_SEL = [
+        ".dc-ripple",
+        ".dc-btn",
+        ".dc-icon-btn",
+        ".dc-fab",
+        ".dc-theme-fab",
+        ".dc-chipwall a",
+        ".dc-postnav a",
+        ".dc-drawer-item",
+        ".dc-drawer-group summary",
+        ".dc-drawer-sub a",
+        ".dc-pagination a",
+        ".dc-tagchip",
+        ".dc-social a",
+        ".dc-linkcard",
+      ].join(",");
+      const addRipple = () =>
+        document.querySelectorAll(RIPPLE_SEL).forEach((el) => el.classList.add("mdui-ripple"));
+      addRipple();
+      window.addEventListener("load", addRipple);
+
+      // ── 抽屉(mdui.Drawer:窄屏遮罩+边缘滑动,≥1024px 常驻) ──
+      const drawerEl = document.getElementById("dc-drawer");
+      const drawer = drawerEl ? new mdui.Drawer(drawerEl, { swipe: true }) : null;
+      document.getElementById("dc-menu-btn")?.addEventListener("click", () => drawer?.toggle());
+      document.querySelector(".dc-drawer-nav")?.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement)?.closest?.("a")) drawer?.close();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") drawer?.close();
+      });
+
+      // ── Snackbar(mdui.snackbar;v3 回到顶部彩蛋文案走这里) ──
+      window.dcSnackbar = (message: string) => {
+        mdui.snackbar(message, { position: "right-top", timeout: 1800 });
+      };
+
+      // ── 回到顶部 ──
+      const backTop = document.getElementById("dc-back-top");
+      if (backTop) {
+        const onScroll = () => {
+          backTop.style.display =
+            document.documentElement.scrollTop > 30 ? "inline-flex" : "none";
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+        backTop.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.dcSnackbar?.("啊!撞到头辣!(๑╹っ╹๑)");
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+---
+// 关于页:渲染 site.aboutContent(平台级配置)。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import AuthorCard from "../components/AuthorCard.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import { renderMarkdown } from "@vanblog/base/lib/markdown/renderer";
+import { sanitizeHtml } from "../lib/sanitizeHtml";
+
+const site = await Astro.locals.getSite();
+const content = site?.aboutContent || "";
+let html = "";
+if (content.trim()) {
+  try {
+    const { code } = await renderMarkdown(content);
+    html = sanitizeHtml(code);
+  } catch {
+    html = "";
+  }
+}
+---
+
+<BaseLayout title="关于" path="/about" site={site ?? {}}>
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <h1 class="dc-page-title">
+        <Icon name="person" size={26} />
+        关于
+      </h1>
+    </div>
+
+    <div class="dc-topgrid" style="align-items:start">
+      <div class="dc-card dc-card--lg">
+        {
+          html ? (
+            <div class="dc-content-body" set:html={html} />
+          ) : (
+            <div class="dc-empty">站长很神秘,什么都没写。</div>
+          )
+        }
+        {
+          site?.aboutUpdatedAt && (
+            <p style="margin:0;padding:0 28px 22px;color:var(--dc-text-muted);font-size:12.5px">
+              更于 {new Date(site.aboutUpdatedAt.replace(" ", "T")).toLocaleDateString("zh-CN")}
+            </p>
+          )
+        }
+      </div>
+
+      <div>
+        <AuthorCard site={site ?? {}} />
+        {
+          (site?.rewards?.length ?? 0) > 0 && (
+            <div class="dc-card dc-card--lg" style="margin-top:20px;padding:18px;text-align:center">
+              <p style="margin:0 0 12px;font-weight:600">赞赏</p>
+              <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+                {site?.rewards?.map((r) => (
+                  <figure style="margin:0">
+                    <img src={r.value} alt={r.name} loading="lazy" style="width:150px;border-radius:8px" />
+                    <figcaption style="color:var(--dc-text-muted);font-size:12.5px;margin-top:6px">{r.name}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          )
+        }
+        <div class="dc-card dc-card--lg" style="margin-top:20px;padding:6px 0 2px">
+          <p style="margin:12px 0 0;text-align:center;font-weight:600">找到我</p>
+          <SocialLinks socials={site?.socials} />
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,115 @@
+---
+// 文章阅读增强脚本:代码复制(平台 .code-copy-btn 委托)+ 图片灯箱
+// + 点击爱心特效(2.x axtx 移植)。受 theme settings 开关控制。
+interface Props {
+  lightbox?: boolean;
+  clickHearts?: boolean;
+}
+
+const { lightbox = true, clickHearts = false } = Astro.props;
+---
+
+<script>
+  // 代码复制:平台管线在 .code-header 里输出 .code-copy-btn(文本"复制"),
+  // 委托监听复制最近 pre>code;标题点击改 hash(标题锚点语义)。
+  document.addEventListener("click", (e) => {
+    const t = e.target as HTMLElement;
+    const btn = t.closest?.(".code-copy-btn");
+    if (btn) {
+      const code = btn.closest(".dc-code")?.querySelector("pre code")?.textContent;
+      if (!code) return;
+      navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = "已复制";
+        btn.classList.add("is-copied");
+        setTimeout(() => {
+          btn.textContent = "复制";
+          btn.classList.remove("is-copied");
+        }, 1600);
+      }).catch(() => {});
+      return;
+    }
+    const h = t.closest?.(".md-heading");
+    if (h) {
+      const id = h.getAttribute("data-id");
+      if (id) window.location.hash = `#${id}`;
+    }
+  });
+</script>
+
+{
+  lightbox && (
+    <script>
+      // 图片灯箱(3.x post.js 移植,纯 DOM 版)
+      (() => {
+        const content = document.querySelector(".dc-content-body");
+        if (!content) return;
+        const closeLightbox = (overlay: HTMLElement, onKeydown: (e: KeyboardEvent) => void) => {
+          overlay.classList.add("is-closing");
+          setTimeout(() => overlay.remove(), 200);
+          document.removeEventListener("keydown", onKeydown);
+          document.documentElement.style.overflow = "";
+        };
+        content.querySelectorAll("img").forEach((img) => {
+          if (img.closest("a")) return;
+          img.classList.add("dc-lightboxable");
+          img.addEventListener("click", () => {
+            if (img.naturalWidth < 150) return;
+            const overlay = document.createElement("div");
+            overlay.className = "dc-lightbox";
+            const image = document.createElement("img");
+            image.src = img.currentSrc || img.src;
+            image.alt = img.alt || "";
+            overlay.appendChild(image);
+            if (img.alt) {
+              const caption = document.createElement("figcaption");
+              caption.textContent = img.alt;
+              overlay.appendChild(caption);
+            }
+            const onKeydown = (event: KeyboardEvent) => {
+              if (event.key === "Escape") closeLightbox(overlay, onKeydown);
+            };
+            overlay.addEventListener("click", () => closeLightbox(overlay, onKeydown));
+            document.addEventListener("keydown", onKeydown);
+            document.documentElement.style.overflow = "hidden";
+            document.body.appendChild(overlay);
+          });
+        });
+      })();
+    </script>
+  )
+}
+
+{
+  clickHearts && (
+    <script>
+      // 点击爱心特效(2.x axtx.js 精神重写:伪元素凑形,缩放+上浮渐隐)
+      (() => {
+        const colors = ["#f92672", "#fd971f", "#8acf00", "#0092ff", "#ae74ac", "#ff4081"];
+        let last = 0;
+        document.addEventListener("click", (e) => {
+          const now = Date.now();
+          if (now - last < 40) return;
+          last = now;
+          const heart = document.createElement("span");
+          heart.className = "dc-heart";
+          heart.style.left = e.clientX - 7 + "px";
+          heart.style.top = e.clientY - 7 + "px";
+          heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+          document.body.appendChild(heart);
+          const start = performance.now();
+          const tick = (t: number) => {
+            const p = (t - start) / 900;
+            if (p >= 1) {
+              heart.remove();
+              return;
+            }
+            heart.style.opacity = String(1 - p);
+            heart.style.transform = `rotate(45deg) scale(${1 + p * 0.5}) translateY(${-p * 60}px)`;
+            requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
+      })();
+    </script>
+  )
+}

@@ -1,0 +1,130 @@
+---
+// 首页(v2 LTS index.php 1:1):
+// content-header 标题带(右浮搜索 FAB 弹搜索框)→ 顶部双卡(横幅大图卡 +
+// 作者卡)→ 文章列表(ImgMode 封面卡 / 文字模式卡;meta.timershaft_opt
+// A/B/C/D 的文章渲染为说说/日志/公告/状态时间轴卡)→ 页码(prev/next FAB)。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import Pagination from "../components/Pagination.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Icon from "../components/Icon.astro";
+import { getPage, stripMarkdown, postMetaString } from "@vanblog/sdk";
+import { withBase, articlePath } from "../lib/base";
+import { fmtDate } from "../lib/dates";
+import type { PostExpand } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const site = await Astro.locals.getSite();
+
+const params = Astro.url.searchParams;
+const page = getPage(params);
+// 置顶优先(对齐原版 Typecho 置顶语义)
+const result = await pb.vanblog.posts.listPublished(page, 10, { sort: "-top,-created", expand: "category,tags" }).catch(() => null);
+const posts = (result?.items ?? []) as PostExpand[];
+const totalPages = result?.totalPages ?? 1;
+
+const themeSettings = await Astro.locals.getThemeSettings();
+const sStr = (key: string) => (typeof themeSettings[key] === "string" ? (themeSettings[key] as string).trim() : "");
+const bannerUrl = sStr("heroImageUrl");
+const bannerCaption = sStr("bannerCaption");
+const authorCoverUrl = sStr("authorCoverUrl");
+
+const siteName = site?.siteName || "DreamCat";
+const siteDesc = site?.siteDesc || "";
+const avatar = site?.authorLogo || site?.siteLogo || "";
+
+// timershaft_opt:A 说说 / B 日志 / C 公告 / D 状态(原版首页时间轴卡)
+const TIMERSHAFT_NAMES: Record<string, string> = { A: "说 说", B: "日 志", C: "公 告", D: "状 态" };
+const listPosts: PostExpand[] = [];
+const timershaftPosts: PostExpand[] = [];
+for (const p of posts) {
+  const opt = postMetaString(p?.meta, "timershaft_opt");
+  if (TIMERSHAFT_NAMES[opt ?? ""]) timershaftPosts.push(p);
+  else listPosts.push(p);
+}
+---
+
+<BaseLayout title="" path="/" site={site ?? {}}>
+  <!-- 标题带(原版 DreamCat-content-header,indigo) -->
+  <div class="dreamcat-content-header">
+    <div class="dc-container">
+      <h1 class="dreamcat-title">{siteName}</h1>
+      <h5 class="dreamcat-subtitle">{siteDesc}</h5>
+    </div>
+    <a
+      class="dreamcat-search-fab mdui-fab mdui-ripple mdui-ripple-white"
+      href={withBase("/search")}
+      title="搜索"
+      aria-label="搜索"
+    >
+      <Icon name="search" size={24} />
+    </a>
+  </div>
+
+  <div class="dc-container">
+    <!-- 顶部双卡(原版 DreamCat-top-card 双卡) -->
+    <div class="dreamcat-top-grid">
+      <!-- 横幅大图卡(headbj1 → heroImageUrl;DC_Dec → bannerCaption) -->
+      <div
+        class="dreamcat-top-banner dc-card dc-card--lg dc-card--hover"
+        style={`background-image:url('${bannerUrl}'), linear-gradient(135deg, var(--dc-primary), color-mix(in srgb, var(--dc-primary) 55%, #000))`}
+      >
+        <span class="dreamcat-top-banner-caption">{bannerCaption || siteDesc || siteName}</span>
+      </div>
+
+      <!-- 作者卡(headbj2 → authorCoverUrl;头像叠出;DC_Decc → siteDesc;社交 icons) -->
+      <div class="dreamcat-top-author dc-card dc-card--lg dc-card--hover">
+        <div
+          class="dreamcat-top-author-cover"
+          style={authorCoverUrl ? `background-image:url('${authorCoverUrl}')` : undefined}
+        />
+        {avatar ? (
+          <img class="dreamcat-top-author-avatar" src={avatar} alt={site?.author || siteName} />
+        ) : (
+          <span class="dreamcat-top-author-avatar dc-avatar-ph">
+            <Icon name="person" size={40} />
+          </span>
+        )}
+        <div class="dreamcat-top-author-chip dc-tagchip">{siteDesc || "博主很懒,啥都没写"}</div>
+        <SocialLinks socials={site?.socials} />
+      </div>
+    </div>
+
+    <!-- 文章列表 -->
+    <div class="dc-post-list">
+      {
+        listPosts.length === 0 && timershaftPosts.length === 0 ? (
+          <div class="dc-card dc-card--lg">
+            <div class="dc-empty">博主很懒,啥都没写 (๑╹っ╹๑)</div>
+          </div>
+        ) : (
+          <>
+            {listPosts.map((post) => (
+              <PostCard post={post} />
+            ))}
+            {timershaftPosts.map((post) => {
+              const opt = postMetaString(post?.meta, "timershaft_opt") ?? "";
+              return (
+                <article class="dreamcat-timer-card dc-card dc-card--hover">
+                  <div class="dreamcat-timer-card__tag">{TIMERSHAFT_NAMES[opt] ?? "公 告"}</div>
+                  <h2 class="dreamcat-timer-card__title">{post.title}</h2>
+                  <p class="dreamcat-timer-card__excerpt">{stripMarkdown(post.content || "", 520)}</p>
+                  <a
+                    class="dreamcat-timer-card__link"
+                    href={withBase(`/posts/${articlePath(post.pathname, post.id)}`)}
+                  >
+                    查看全文 →
+                  </a>
+                </article>
+              );
+            })}
+          </>
+        )
+      }
+    </div>
+
+    <Pagination base="/" params={params} page={page} totalPages={totalPages} />
+  </div>
+</BaseLayout>

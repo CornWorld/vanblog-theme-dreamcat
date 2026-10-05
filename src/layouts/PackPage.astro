@@ -1,0 +1,20 @@
+---
+// Pack 页面宿主(/p/<pack>):packs integration 注入的虚拟模块
+// vanblog:theme 会 resolve 到本文件。包一层主题外壳即可。
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const props = Astro.props as Props;
+---
+
+<BaseLayout {...props}>
+  <div class="dc-container">
+    <div class="dc-card dc-card--lg" style="margin-top:28px;padding:8px 22px 22px">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

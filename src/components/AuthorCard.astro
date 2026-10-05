@@ -1,0 +1,36 @@
+---
+// 作者卡(2.x index 右卡的现代重写):封顶图 + 头像 + 描述 + 社交行。
+import Icon from "./Icon.astro";
+import SocialLinks from "./SocialLinks.astro";
+import type { Site } from "@vanblog/sdk";
+
+interface Props {
+  site: Partial<Site>;
+  coverUrl?: string;
+}
+
+const { site, coverUrl = "" } = Astro.props;
+const name = site?.author || site?.siteName || "DreamCat";
+const avatar = site?.authorLogo || site?.siteLogo || "";
+const desc = site?.siteDesc || "";
+---
+
+<div class="dc-author-card dc-card dc-card--lg dc-card--hover">
+  <div
+    class="dc-author-card__cover"
+    style={coverUrl ? `background-image:url('${coverUrl}')` : undefined}
+  >
+  </div>
+  {
+    avatar ? (
+      <img class="dc-author-card__avatar" src={avatar} alt={name} loading="lazy" />
+    ) : (
+      <span class="dc-author-card__avatar dc-avatar-ph">
+        <Icon name="person" size={44} />
+      </span>
+    )
+  }
+  <div class="dc-author-card__name">{name}</div>
+  {desc && <p class="dc-author-card__desc">{desc}</p>}
+  <SocialLinks socials={site?.socials} />
+</div>

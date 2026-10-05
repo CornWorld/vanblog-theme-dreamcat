@@ -1,0 +1,161 @@
+---
+// 左侧抽屉:行为层 = mdui.Drawer(mdui-drawer 类;窄屏遮罩+swipe,≥1024px 常驻),
+// 皮肤层 = dc-drawer(宽度/背景/阴影)。品牌区与手风琴承接 2.x 结构。
+// 导航:site.nav 自定义优先(旗舰同语义:自定义整体替换默认集);
+// 默认集追加 pack 注册的导航项;RSS/后台按平台 displayOptions 开关。
+import Icon from "./Icon.astro";
+import { withBase } from "../lib/base";
+import type { Site, Category, PackNav } from "@vanblog/sdk";
+
+interface Props {
+  site: Partial<Site>;
+  drawerBgUrl: string;
+  categories: Category[];
+  postCount: number;
+  currentPath: string;
+  packNavItems: PackNav[];
+  showAdminButton: boolean;
+  showRSS: boolean;
+}
+
+const {
+  site,
+  drawerBgUrl,
+  categories,
+  postCount,
+  currentPath,
+  packNavItems,
+  showAdminButton,
+  showRSS,
+} = Astro.props;
+
+const siteName = site?.siteName || "DreamCat";
+const avatar = site?.authorLogo || site?.siteLogo || "";
+const brandStyle = drawerBgUrl
+  ? `background-image:url('${drawerBgUrl}')`
+  : "background-image:linear-gradient(135deg, var(--dc-primary), color-mix(in srgb, var(--dc-primary) 55%, #000))";
+
+const isActive = (href: string) =>
+  href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+
+// 平台自定义导航(旗舰同语义:非空则整体替换默认导航)
+const customNav = (site?.nav ?? []).map((n) => ({
+  label: n.name,
+  href: withBase(n.value),
+}));
+---
+
+<aside class="dc-drawer mdui-drawer mdui-drawer-left" id="dc-drawer">
+  <div class="dc-drawer-brand" style={brandStyle}>
+    {avatar ? (
+      <img class="dc-drawer-avatar" src={avatar} alt={siteName} loading="lazy" />
+    ) : (
+      <span class="dc-drawer-avatar dc-avatar-ph">
+        <Icon name="person" size={40} />
+      </span>
+    )}
+    <div class="dc-drawer-title">{siteName}</div>
+  </div>
+
+  <nav class="dc-drawer-nav">
+    {
+      customNav.length > 0 ? (
+        customNav.map((entry) => (
+          <a class:list={["dc-drawer-item", { "is-active": isActive(entry.href) }]} href={entry.href}>
+            <Icon name="description" />
+            <span>{entry.label}</span>
+          </a>
+        ))
+      ) : (
+        <>
+          <a class:list={["dc-drawer-item", { "is-active": isActive("/") }]} href={withBase("/")}>
+            <Icon name="home" />
+            <span>首页</span>
+          </a>
+
+          <details class="dc-drawer-group">
+            <summary>
+              <Icon name="archive" />
+              <span>归档</span>
+              <Icon name="arrowDown" class="dc-arrow" size={18} />
+            </summary>
+            <ul class="dc-drawer-sub">
+              <li><a href={withBase("/archive")}>全部文章</a></li>
+              <li><a href={withBase("/timeline")}>时间轴</a></li>
+            </ul>
+          </details>
+
+          <details class="dc-drawer-group" open={isActive("/categories")}>
+            <summary>
+              <Icon name="folder" />
+              <span>分类</span>
+              <Icon name="arrowDown" class="dc-arrow" size={18} />
+            </summary>
+            <ul class="dc-drawer-sub">
+              {categories.length === 0 ? (
+                <li><a href={withBase("/categories")}>暂无分类</a></li>
+              ) : (
+                categories.map((c) => (
+                  <li>
+                    <a href={withBase(`/categories/${c.id}`)} title={c.name}>
+                      {c.name}
+                    </a>
+                  </li>
+                ))
+              )}
+            </ul>
+          </details>
+
+          <a class:list={["dc-drawer-item", { "is-active": isActive("/tags") }]} href={withBase("/tags")}>
+            <Icon name="tag" />
+            <span>标签</span>
+          </a>
+
+          {packNavItems.map((p) => (
+            <a class:list={["dc-drawer-item", { "is-active": isActive(p.href) }]} href={p.href}>
+              <Icon name="description" />
+              <span>{p.label}</span>
+            </a>
+          ))}
+
+          {(site?.links?.length ?? 0) > 0 && (
+            <a class:list={["dc-drawer-item", { "is-active": isActive("/link") }]} href={withBase("/link")}>
+              <Icon name="link" />
+              <span>友链</span>
+            </a>
+          )}
+
+          {site?.aboutContent && site.aboutContent.trim() && (
+            <a class:list={["dc-drawer-item", { "is-active": isActive("/about") }]} href={withBase("/about")}>
+              <Icon name="person" />
+              <span>关于</span>
+            </a>
+          )}
+        </>
+      )
+    }
+
+    {
+      showRSS && (
+        <a class="dc-drawer-item" href={withBase("/api/feed.xml")} target="_blank" rel="noopener">
+          <Icon name="rss" />
+          <span>RSS</span>
+        </a>
+      )
+    }
+
+    {
+      showAdminButton && (
+        <a class="dc-drawer-item" href="/admin/" target="_blank" rel="noopener">
+          <Icon name="description" />
+          <span>后台</span>
+        </a>
+      )
+    }
+  </nav>
+
+  <div class="dc-drawer-meta">
+    <Icon name="description" size={14} />
+    文章 <b>{postCount}</b> 篇
+  </div>
+</aside>

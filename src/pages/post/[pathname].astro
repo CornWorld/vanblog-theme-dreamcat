@@ -1,0 +1,39 @@
+---
+// permalink(pathname)直连:发布且非私密的文章 301 到 /posts/<id>;
+// 其余(私密/草稿/不存在)一律 404,不泄露可猜测性。
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { withBase } from "../../lib/base";
+import type { Post } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const { pathname } = Astro.params;
+if (!pathname) return Astro.redirect("/404");
+
+try {
+  const post = await pb.collection("posts").getFirstListItem<Post>(
+    `pathname="${pathname}" && deleted=false`,
+    { fields: "id,status,private" },
+  );
+  if (post.status === "published" && !post.private) {
+    return Astro.redirect(withBase(`/posts/${post.id}`), 301);
+  }
+} catch {
+  // Not found or not published — fall through to 404.
+}
+
+Astro.response.status = 404;
+---
+
+<BaseLayout title="文章不存在">
+  <div class="dc-container">
+    <div class="dc-card dc-card--lg" style="margin-top:28px">
+      <div class="dc-404">
+        <p class="dc-404__code">404</p>
+        <p class="dc-404__msg">文章不存在或未发布。</p>
+        <a class="dc-btn dc-btn--ghost" href="/">返回首页</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

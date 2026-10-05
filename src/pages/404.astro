@@ -1,0 +1,30 @@
+---
+// 404(原版 404.php 1:1):content-header → 大图头 → 工具卡 → 404.svg 大图。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/base";
+
+Astro.response.status = 404;
+
+const themeSettings = await Astro.locals.getThemeSettings();
+const heroImageUrl = typeof themeSettings.heroImageUrl === "string" ? themeSettings.heroImageUrl.trim() : "";
+---
+
+<BaseLayout title="页面未找到" path="/404">
+  <div class="dreamcat-content-header">
+    <div class="dc-container">
+      <h1 class="dreamcat-title">页面未找到</h1>
+    </div>
+  </div>
+
+  <div class="dc-container">
+    <div class="dreamcat-404-figure">
+      <img src={`${__VANBLOG_THEME_PREFIX__}/img/404.svg`} alt="404" loading="lazy" />
+    </div>
+    <div class="dc-404" style="margin:0 auto">
+      <p class="dc-404__msg">你要找的页面不在这里 (๑╹っ╹๑)</p>
+      <a class="dc-btn" href={withBase("/")}>返回首页</a>
+    </div>
+  </div>
+</BaseLayout>

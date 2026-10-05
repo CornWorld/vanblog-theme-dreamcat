@@ -1,0 +1,62 @@
+---
+// 分类详情:该分类下的文章。
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icon.astro";
+import PostCard from "../../components/PostCard.astro";
+import Pagination from "../../components/Pagination.astro";
+import { getPage } from "@vanblog/sdk";
+import { withBase } from "../../lib/base";
+import type { Category, PostExpand } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/404");
+let cat: Category;
+try {
+  cat = await pb.collection("categories").getOne<Category>(id);
+} catch {
+  return Astro.redirect("/404");
+}
+
+const params = Astro.url.searchParams;
+const page = getPage(params);
+const result = await pb.vanblog.posts
+  .listPublished(page, 10, { category: cat.name, sort: "-created" })
+  .catch(() => null);
+const posts = (result?.items ?? []) as PostExpand[];
+const totalPages = result?.totalPages ?? 1;
+---
+
+<BaseLayout title={`分类: ${cat.name}`} path={`/categories/${id}`}>
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <p style="margin:0 0 4px">
+        <a href={withBase("/categories")} style="color:var(--dc-text-muted);font-size:13px">
+          ← 所有分类
+        </a>
+      </p>
+      <h1 class="dc-page-title">
+        <Icon name="folder" size={26} />
+        {cat.name}
+      </h1>
+      {cat.meta?.description && <p class="dc-page-desc">{cat.meta.description}</p>}
+    </div>
+
+    {
+      posts.length === 0 ? (
+        <div class="dc-card dc-card--lg" style="margin-top:20px">
+          <div class="dc-empty">该分类下暂无文章。</div>
+        </div>
+      ) : (
+        <div class="dc-post-list">
+          {posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      )
+    }
+    <Pagination base={`/categories/${id}`} params={params} page={page} totalPages={totalPages} />
+  </div>
+</BaseLayout>

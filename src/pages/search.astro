@@ -1,0 +1,64 @@
+---
+// 搜索页:与旗舰主题同语义 —— 渲染 pb.vanblog.search.query 的
+// SearchResult(title + path)本身,不做卡片水合(结果只有 id/title/path,
+// 再按列表拉取会丢第 30 篇之后的命中)。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import { safe } from "@vanblog/sdk";
+import { withBase, articlePath } from "../lib/base";
+
+const pb = Astro.locals.pb;
+const site = await Astro.locals.getSite();
+const q = (Astro.url.searchParams.get("q") || "").trim();
+const searched = !!q;
+const { data: results = [] } = searched
+  ? await safe(() => pb.vanblog.search.query(q, { limit: 30 }), "search")
+  : { data: [] as { id: string; title: string; path: string }[] };
+---
+
+<BaseLayout title={searched ? `搜索: ${q}` : "搜索"} path="/search" site={site ?? {}}>
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <h1 class="dc-page-title">
+        <Icon name="search" size={26} />
+        搜索
+      </h1>
+    </div>
+
+    <div class="dc-searchbar" style="margin-top:20px">
+      <form method="get" action={withBase("/search")}>
+        <Icon name="search" size={19} />
+        <input type="text" name="q" value={q} placeholder="输入关键词…" aria-label="搜索" required />
+      </form>
+    </div>
+
+    {
+      searched && (
+        <p class="dc-page-desc" style="text-align:center;margin-top:16px">
+          关键词 "{q}" 共 {results.length} 条结果
+        </p>
+      )
+    }
+
+    {
+      results.length > 0 ? (
+        <div class="dc-card dc-card--lg" style="margin-top:24px;padding:8px 26px 16px">
+          <ul class="dc-archive-list">
+            {results.map((r) => (
+              <li>
+                <span class="dc-linkcard__desc" style="flex:0 0 auto">{r.path || r.id}</span>
+                <a href={withBase(`/posts/${articlePath(r.path, r.id)}`)}>{r.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : searched ? (
+        <div class="dc-card dc-card--lg" style="margin-top:24px">
+          <div class="dc-empty">未找到匹配的文章 (๑╹っ╹๑)</div>
+        </div>
+      ) : null
+    }
+  </div>
+</BaseLayout>

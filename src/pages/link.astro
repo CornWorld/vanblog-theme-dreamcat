@@ -1,0 +1,58 @@
+---
+// 友链页(2.x link.php 的移植):数据源平台 site.links([{name,url,desc,logo}])。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import type { Site } from "@vanblog/sdk";
+
+const site = (await Astro.locals.getSite()) as Partial<Site>;
+const links = site?.links ?? [];
+---
+
+<BaseLayout title="友链" path="/link" site={site ?? {}}>
+  <div class="dreamcat-content-header">
+    <div class="dc-container" style="text-align:center">
+      <h1 class="dreamcat-title">友情链接</h1>
+    </div>
+  </div>
+
+  <div
+    class="dreamcat-img-header dreamcat-img-header-md"
+    style={`background-image:url('${__VANBLOG_THEME_PREFIX__}/img/post_bj.jpg')`}
+  />
+
+  <div class="dc-container">
+    <div class="dc-card dc-card--lg" style="margin-top:26px;padding:22px">
+      {
+        links.length === 0 ? (
+          <div class="dc-empty">暂无友链,快去后台添加 site.links。</div>
+        ) : (
+          <div class="dc-linkgrid" style="margin-top:0">
+            {links.map((l) => (
+              <a
+                class="dc-linkcard dc-card dc-card--hover mdui-ripple"
+                href={l.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={l.desc || l.name}
+              >
+                {l.logo ? (
+                  <img src={l.logo} alt={l.name} loading="lazy" />
+                ) : (
+                  <span class="dc-linkcard__ph">
+                    <Icon name="link" size={22} />
+                  </span>
+                )}
+                <span style="min-width:0">
+                  <p class="dc-linkcard__name">{l.name}</p>
+                  {l.desc && <p class="dc-linkcard__desc">{l.desc}</p>}
+                </span>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

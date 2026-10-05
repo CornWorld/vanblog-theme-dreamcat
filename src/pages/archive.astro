@@ -1,0 +1,62 @@
+---
+// 归档:按年分组的文章列表。
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import { withBase, articlePath } from "../lib/base";
+import { fmtDate } from "../lib/dates";
+import type { Post } from "@vanblog/sdk";
+
+const pb = Astro.locals.pb;
+const result = await pb.vanblog.posts.listPublished(1, 500, { sort: "-created" }).catch(() => null);
+const posts = (result?.items ?? []) as Post[];
+
+const byYear = new Map<number, Post[]>();
+for (const post of posts) {
+  if (!post.created) continue;
+  const year = new Date(post.created.replace(" ", "T")).getFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" path="/archive">
+  <div class="dc-container">
+    <div class="dc-page-head">
+      <h1 class="dc-page-title">
+        <Icon name="archive" size={26} />
+        归档
+      </h1>
+      <p class="dc-page-desc">共 {posts.length} 篇文章</p>
+    </div>
+
+    <div class="dc-card dc-card--lg" style="margin-top:20px;padding:8px 26px 22px">
+      {
+        years.length === 0 ? (
+          <div class="dc-empty">暂无文章。</div>
+        ) : (
+          years.map((year) => (
+            <section>
+              <h2 class="dc-archive-year">
+                {year}
+                <small style="color:var(--dc-text-muted);font-size:14px;font-weight:400">
+                  ({byYear.get(year)!.length})
+                </small>
+              </h2>
+              <ul class="dc-archive-list">
+                {byYear.get(year)!.map((post) => (
+                  <li>
+                    <time datetime={post.created}>{fmtDate(post.created)}</time>
+                    <a href={withBase(`/posts/${articlePath(post.pathname, post.id)}`)}>{post.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

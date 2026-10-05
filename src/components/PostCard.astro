@@ -1,0 +1,85 @@
+---
+// 文章列表卡片。ImgMode(封面大图 + 标题压图,2.x 经典)与文字模式合一:
+// 有封面走封面卡,无封面走渐变占位 + 摘要,不空版。
+import Icon from "./Icon.astro";
+import { withBase, articlePath } from "../lib/base";
+import { stripMarkdown, postMetaString } from "@vanblog/sdk";
+import { fmtDate } from "../lib/dates";
+import type { PostExpand } from "@vanblog/sdk";
+
+interface Props {
+  post: PostExpand;
+  showCover?: boolean;
+}
+
+const { post, showCover = true } = Astro.props;
+
+const href = withBase(`/posts/${articlePath(post.pathname, post.id)}`);
+const cover = postMetaString(post?.meta, "cover", "image", "ogImage") || "";
+const hasCover = showCover && !!cover;
+const excerpt = stripMarkdown(post.content || "", 120) || "";
+const isTop = (post.top ?? 0) > 0;
+---
+
+<a class="dc-post-card dc-card dc-card--lg dc-card--hover dc-ripple" href={href}>
+  {
+    hasCover ? (
+      <div class="dc-post-card__media">
+        <img src={cover} alt={post.title} loading="lazy" />
+        {/* 原版 ImgMode:标题压图 + 底部渐变(mdui-card-media-covered 语义) */}
+        <div class="dc-post-card__overlay">
+          <h2 class="dc-post-card__title">{post.title}</h2>
+          <div class="dc-post-card__date">发表时间: {fmtDate(post.created)}</div>
+        </div>
+        {isTop && (
+          <span class="dc-post-card__pin">
+            <Icon name="pin" size={13} />
+            置顶
+          </span>
+        )}
+      </div>
+    ) : (
+      <div class="dc-post-card__head--text">
+        <h2 class="dc-post-card__title">{post.title}</h2>
+      </div>
+    )
+  }
+  <div class="dc-post-card__body">
+    {!hasCover && isTop && (
+      <span class="dc-tagchip" style="margin-bottom:6px">
+        <Icon name="pin" size={12} />
+        置顶
+      </span>
+    )}
+    {excerpt && <p class="dc-post-card__excerpt">{excerpt}</p>}
+    <div style="text-align:center">
+      <span style="color:var(--dc-text-muted);font-weight:200;font-size:15px">- 阅读剩余部分 -</span>
+    </div>
+    <div class="dc-post-card__chips">
+      {post.expand?.category && (
+        <span class="dc-tagchip">
+          <Icon name="folder" size={12} />
+          {post.expand.category.name}
+        </span>
+      )}
+      {(post.expand?.tags ?? []).map((t) => (
+        <span class="dc-tagchip">
+          <Icon name="tag" size={12} />
+          {t.name}
+        </span>
+      ))}
+    </div>
+    <div class="dc-post-card__meta">
+      <span>
+        <Icon name="schedule" size={15} />
+        <time datetime={post.created}>{fmtDate(post.created) || "—"}</time>
+      </span>
+      {(post.viewCount ?? 0) > 0 && (
+        <span>
+          <Icon name="visibility" size={15} />
+          {post.viewCount}
+        </span>
+      )}
+    </div>
+  </div>
+</a>

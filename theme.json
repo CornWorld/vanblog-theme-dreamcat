@@ -1,0 +1,81 @@
+{
+  "name": "dreamcat",
+  "label": "DreamCat",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 经典 Material 视觉的 VanBlog 移植版: 抽屉导航、大圆角软阴影卡片、五色条、时间轴; 去 MDUI 框架的现代 CSS 重写, 承接 Typecho 版 2.x/3.x 的设计资产。",
+  "recommendedPalette": "dreamcat",
+  "paletteMigrationMode": "keep",
+  "settings": {
+    "footerText": {
+      "type": "text",
+      "label": "页脚附言",
+      "default": "",
+      "placeholder": "显示在页脚版权行上方的一行文字（留空不显示）"
+    },
+    "drawerBgUrl": {
+      "type": "string",
+      "label": "抽屉顶部背景图 URL",
+      "default": "",
+      "placeholder": "https://example.com/drawer-bg.jpg（留空显示主题色渐变）"
+    },
+    "heroImageUrl": {
+      "type": "string",
+      "label": "首页横幅大图 URL",
+      "default": "",
+      "placeholder": "https://example.com/hero.jpg（留空显示主题色渐变）"
+    },
+    "showListCover": {
+      "type": "boolean",
+      "label": "文章列表显示封面图",
+      "default": true
+    },
+    "showToc": {
+      "type": "boolean",
+      "label": "文章页显示目录",
+      "default": true
+    },
+    "showLightbox": {
+      "type": "boolean",
+      "label": "文章图片灯箱",
+      "default": true
+    },
+    "showClickHearts": {
+      "type": "boolean",
+      "label": "点击爱心特效",
+      "default": false
+    },
+    "showBackToTop": {
+      "type": "boolean",
+      "label": "显示「回到顶部」按钮",
+      "default": true
+    },
+    "showThemePicker": {
+      "type": "boolean",
+      "label": "显示主题配色切换按钮(访客可选主色/强调色/明暗模式)",
+      "default": true
+    },
+    "fontFamily": {
+      "type": "select",
+      "label": "正文字体(主题自带,对齐 Typecho 版 DC_CustomFontRadio)",
+      "values": [
+        "jetbrains-mono",
+        "smiley",
+        "system"
+      ],
+      "default": "jetbrains-mono"
+    },
+    "bannerCaption": {
+      "type": "text",
+      "label": "首页横幅卡文案(对齐 DC_Dec)",
+      "default": "",
+      "placeholder": "显示在首页横幅大图卡上的文案(留空显示站点描述)"
+    },
+    "authorCoverUrl": {
+      "type": "string",
+      "label": "首页作者卡封面图 URL(对齐 headbj2)",
+      "default": "",
+      "placeholder": "https://example.com/cover.jpg（留空显示主题色）"
+    }
+  }
+}

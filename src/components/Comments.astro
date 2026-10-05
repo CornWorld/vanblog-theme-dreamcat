@@ -1,0 +1,85 @@
+---
+// 评论区:平台 Artalk(provider='artalk' 时渲染)。资源从 Artalk 同源
+// /dist/ 注入,dark 联动监听平台 darkmodechange 事件(与旗舰主题一致)。
+import Icon from "./Icon.astro";
+import type { Site } from "@vanblog/sdk";
+
+interface Props {
+  site: Partial<Site>;
+  path: string;
+}
+
+const { site, path } = Astro.props;
+
+const provider = site?.commentsProvider;
+const cfg = (site?.commentsConfig ?? {}) as { server?: string; site?: string };
+const server = provider === "artalk" ? (cfg.server || "").trim() : "";
+const siteName = cfg.site || site?.siteName || "VanBlog";
+const enabled = provider !== "disabled";
+---
+
+{
+  enabled && (
+    <section class="dc-comments" id="comments">
+      <h2 class="dc-comments__title">
+        <Icon name="chat" size={20} />
+        评论
+      </h2>
+      <div class="dc-artalk" id="artalk-container" data-server={server} data-site={siteName} data-path={path} />
+      {provider === "artalk" && !server && (
+        <p class="dc-empty" style="margin:12px 0">
+          评论区未配置 Artalk 服务地址。
+        </p>
+      )}
+    </section>
+  )
+}
+
+<script>
+  // Artalk 装载(仅 provider=artalk 且配置了 server 时)。容器 data-* 由
+  // 服务端下发;外部评论(external)由用户脚本自管,此处不处理。
+  (() => {
+    const el = document.getElementById("artalk-container") as HTMLElement | null;
+    if (!el) return;
+    const server = el.dataset.server || "";
+    if (!server) return;
+    const site = el.dataset.site || "VanBlog";
+    const pageKey = el.dataset.path || window.location.pathname;
+    const getDark = () => document.documentElement.classList.contains("dark");
+
+    const ensureAsset = (tag: "link" | "script", attr: "href" | "src") => {
+      const url = `${server}/dist/${tag === "link" ? "Artalk.css" : "Artalk.js"}`;
+      if (!document.querySelector(`${tag}[${attr}="${url}"]`)) {
+        const node = document.createElement(tag);
+        node.setAttribute(attr, url);
+        if (tag === "link") node.setAttribute("rel", "stylesheet");
+        document.head.appendChild(node);
+      }
+      return url;
+    };
+    ensureAsset("link", "href");
+    const jsUrl = ensureAsset("script", "src");
+
+    const init = () => {
+      const Artalk = (window as { Artalk?: { init: (o: Record<string, unknown>) => { ui?: { setDarkMode: (d: boolean) => void } } } }).Artalk;
+      if (!el || typeof Artalk === "undefined") return;
+      const instance = Artalk.init({
+        el: "#artalk-container",
+        server,
+        site,
+        pageKey,
+        darkMode: getDark() ? "dark" : false,
+      });
+      document.documentElement.addEventListener("darkmodechange", (e) => {
+        const detail = (e as CustomEvent<{ dark?: boolean }>).detail;
+        instance?.ui?.setDarkMode(detail?.dark ?? getDark());
+      });
+    };
+
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${jsUrl}"]`);
+    if (existing) {
+      if ((window as { Artalk?: unknown }).Artalk) init();
+      else existing.addEventListener("load", init, { once: true });
+    }
+  })();
+</script>

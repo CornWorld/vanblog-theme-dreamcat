@@ -1,0 +1,42 @@
+---
+// 分页(2.x moe-page-div 的胶囊样式)。
+import Icon from "./Icon.astro";
+import { buildPageHref } from "@vanblog/sdk";
+
+interface Props {
+  base: string;
+  params: URLSearchParams;
+  page: number;
+  totalPages: number;
+}
+
+const { base, params, page, totalPages } = Astro.props;
+---
+
+{
+  totalPages > 1 && (
+    <nav class="dc-pagination" aria-label="分页">
+      {page > 1 ? (
+        <a href={buildPageHref(base, params, page - 1)} rel="prev">
+          <Icon name="arrowLeft" size={16} />
+        </a>
+      ) : (
+        <span class="is-disabled">
+          <Icon name="arrowLeft" size={16} />
+        </span>
+      )}
+      <span class="is-current">
+        {page} / {totalPages}
+      </span>
+      {page < totalPages ? (
+        <a href={buildPageHref(base, params, page + 1)} rel="next">
+          <Icon name="arrowRight" size={16} />
+        </a>
+      ) : (
+        <span class="is-disabled">
+          <Icon name="arrowRight" size={16} />
+        </span>
+      )}
+    </nav>
+  )
+}

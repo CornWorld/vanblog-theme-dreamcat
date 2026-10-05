@@ -1,0 +1,69 @@
+---
+// 页脚(v2 LTS footer.php 1:1):灰底居中(Copyright / ICP / 自定义文字)+
+// 「关于 DreamCat」对话框(主题/开发者信息,原版 About_DreamCat 1:1)。
+import type { Site } from "@vanblog/sdk";
+
+interface Props {
+  site: Partial<Site>;
+  footerText?: string;
+}
+
+const { site, footerText = "" } = Astro.props;
+const siteName = site?.siteName || "DreamCat";
+const sinceYear = site?.since ? new Date(site.since.replace(" ", "T")).getFullYear() : null;
+const year = new Date().getFullYear();
+const yearRange = sinceYear && sinceYear < year ? `${sinceYear} - ` : "";
+---
+
+<footer class="dc-footer">
+  <div class="dc-footer-col">
+    <p class="dc-footer-line">
+      Copyright © {yearRange}
+      {year}
+      <a href="/">{siteName}</a>.
+    </p>
+    {
+      site?.beianNumber && (
+        <a class="dc-footer-line" href={site?.beianUrl || "https://beian.miit.gov.cn/"} target="_blank" rel="noopener noreferrer">
+          互联网ICP备案:{site.beianNumber}
+        </a>
+      )
+    }
+    {footerText && <p class="dc-footer-line">{footerText}</p>}
+    <button class="dc-footer-about mdui-ripple" data-dc-about>关于 DreamCat</button>
+  </div>
+</footer>
+
+<!-- 关于 DreamCat(原版 About_DreamCat 对话框 1:1) -->
+<div class="mdui-dialog" id="dc-about-dreamcat">
+  <div class="mdui-dialog-title">关于 DreamCat</div>
+  <div class="mdui-dialog-content">
+    <blockquote class="dc-about-quote">
+      <p>
+        主题名称:<a href="https://github.com/LychApe/DreamCat" target="_blank" rel="noopener noreferrer">DreamCat</a> |
+        版本:<a href="https://github.com/LychApe/DreamCat" target="_blank" rel="noopener noreferrer">VanBlog 移植版</a>
+      </p>
+      <p>
+        主题开发:<a href="https://github.com/HanFengA7" target="_blank" rel="noopener noreferrer">HanFengA7</a> |
+        <a href="https://github.com/TeddyNight" target="_blank" rel="noopener noreferrer">TeddyNight</a> |
+        <a href="https://github.com/Dev-Leo" target="_blank" rel="noopener noreferrer">Dev-Leo</a> |
+        <a href="https://github.com/CornWorld" target="_blank" rel="noopener noreferrer">CornWorld</a> |
+        <a href="https://github.com/whitebearcn" target="_blank" rel="noopener noreferrer">WhiteBearcn</a>
+      </p>
+      <p>Copyright © 2015-{year} by LychApe</p>
+    </blockquote>
+  </div>
+  <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-close>知 道 啦 !</button>
+  </div>
+</div>
+
+<script>
+  // 关于弹窗(页脚按钮 → mdui Dialog;内联脚本经 window.mdui)
+  document.addEventListener("click", (e) => {
+    const t = e.target as HTMLElement;
+    if (!t.closest?.("[data-dc-about]") || !window.mdui) return;
+    const el = document.getElementById("dc-about-dreamcat");
+    if (el) new window.mdui.Dialog(el, { history: false }).open();
+  });
+</script>

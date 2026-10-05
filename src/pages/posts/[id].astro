@@ -1,0 +1,326 @@
+---
+// DreamCat 文章页:完整阅读体验(标题卡/正文排版/标签分类/版权盒 + 五色条/
+// 上下篇/目录/代码复制/灯箱/Artalk 评论/访问计数)。
+// 密码锁语义与平台一致:匿名读者经平台 unlock 端点校验,未通过渲染解锁卡。
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import FiveColorBar from "../../components/FiveColorBar.astro";
+import Comments from "../../components/Comments.astro";
+import Toc from "../../components/Toc.astro";
+import PostEffects from "../../components/PostEffects.astro";
+import Icon from "../../components/Icon.astro";
+import { isAuthenticated, safe, postMetaString, stripMarkdown } from "@vanblog/sdk";
+import { renderMarkdown } from "@vanblog/base/lib/markdown/renderer";
+import { normalizeMathDelimiters } from "@vanblog/base/lib/markdown/normalizeMathDelimiters";
+import type { Post } from "@vanblog/sdk";
+import { sanitizeHtml } from "../../lib/sanitizeHtml";
+import { dreamcatDom } from "../../lib/mdDom";
+import { extractHeadings, hasHeadings } from "../../lib/toc";
+import { fmtDate } from "../../lib/dates";
+import { articlePath, withBase } from "../../lib/base";
+
+const pb = Astro.locals.pb;
+const site = await Astro.locals.getSite();
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/404");
+
+let data: Post | null = null;
+let html: string | null = null;
+let locked = false;
+try {
+  let raw: Post | null = null;
+  try {
+    raw = await pb.collection("posts").getOne<Post>(id);
+  } catch {
+    // id 未命中 → 按 permalink(pathname)双形态匹配(存储混用 "/slug"/"slug")
+    const esc = id.replace(/"/g, '\\"');
+    raw = await pb.collection("posts").getFirstListItem<Post>(
+      `(pathname="/${esc}" || pathname="${esc}") && deleted=false`,
+    );
+  }
+  if (raw) {
+    data = raw;
+    // 草稿/私密/已删除的可见性由 PB API 规则把关(匿名拿不到即走 catch);
+    // 密码锁语义:平台遮蔽 content,解锁走 Go 端点 + 主题中继(下方)。
+    if (raw.hasPassword || raw.password) {
+      if (isAuthenticated(pb)) {
+        html = (await renderMarkdown(normalizeMathDelimiters(raw.content || ""))).code;
+      } else {
+        const reqPath = new URL(Astro.request.url).pathname;
+        const mount = reqPath.match(/^\/themes\/[^/]+/);
+        const basePath = mount ? mount[0] : "";
+        const r = await fetch(`${pb.baseURL}/api/vanblog/posts/${raw.id}/unlock`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            cookie: Astro.request.headers.get("cookie") || "",
+          },
+          body: JSON.stringify({ basePath }),
+        });
+        if (r.ok) {
+          const j = await r.json();
+          html = (await renderMarkdown(normalizeMathDelimiters(j.content || ""))).code;
+        } else {
+          locked = true;
+        }
+      }
+    } else {
+      html = (await renderMarkdown(normalizeMathDelimiters(raw.content || ""))).code;
+    }
+  }
+} catch {
+  if (isAuthenticated(pb)) {
+    Astro.response.status = 404;
+  } else {
+    // 私密/草稿对匿名不可见 → 引导去平台管理后台登录后重访
+    return Astro.redirect("/admin/");
+  }
+}
+
+const safeHtml = html !== null ? dreamcatDom(sanitizeHtml(html)) : null;
+const tocItems = safeHtml ? extractHeadings(safeHtml) : [];
+const hasToc = !!safeHtml && hasHeadings(safeHtml);
+
+const themeSettings = await Astro.locals.getThemeSettings();
+const sBool = (key: string, fallback = true) =>
+  typeof themeSettings[key] === "boolean" ? (themeSettings[key] as boolean) : fallback;
+const showToc = sBool("showToc");
+const showLightbox = sBool("showLightbox");
+const showClickHearts = sBool("showClickHearts", false);
+const showListCover = sBool("showListCover");
+
+// 上下篇(created 相邻,与 Typecho 版语义一致)
+let prePost: { id: string; title: string } | null = null;
+let nextPost: { id: string; title: string } | null = null;
+if (data?.created) {
+  const baseFilter = 'status = "published" && deleted = false';
+  const { data: older } = await safe(
+    () =>
+      pb.collection("posts").getList<Post>(1, 1, {
+        filter: `${baseFilter} && created < "${data!.created}"`,
+        sort: "-created",
+        fields: "id,title,pathname",
+      }),
+    "post-prev",
+  );
+  const { data: newer } = await safe(
+    () =>
+      pb.collection("posts").getList<Post>(1, 1, {
+        filter: `${baseFilter} && created > "${data!.created}"`,
+        sort: "created",
+        fields: "id,title,pathname",
+      }),
+    "post-next",
+  );
+  const prev = older?.items?.[0];
+  const next = newer?.items?.[0];
+  if (prev?.id) prePost = { id: articlePath(prev.pathname, prev.id), title: prev.title };
+  if (next?.id) nextPost = { id: articlePath(next.pathname, next.id), title: next.title };
+}
+
+// 标签/分类:id → 名称映射
+let tagNames: string[] = [];
+let categoryName = "";
+const tagIds = data?.tags ?? [];
+if (tagIds.length) {
+  const { data: tags } = await safe(
+    () => pb.collection("tags").getFullList<{ id: string; name: string }>(),
+    "post-tags",
+  );
+  const tagMap = Object.fromEntries((tags ?? []).map((t) => [t.id, t.name]));
+  tagNames = tagIds.map((tid) => tagMap[tid]).filter(Boolean);
+}
+if (data?.category) {
+  const categoryId = data.category;
+  const { data: cat } = await safe(
+    () => pb.collection("categories").getOne<{ name: string }>(categoryId),
+    "post-category",
+  );
+  categoryName = cat?.name || "";
+}
+
+const authorName = site?.author || "";
+const siteName = site?.siteName || "DreamCat";
+const cover = postMetaString(data?.meta, "cover", "image", "ogImage");
+---
+
+<BaseLayout
+  title={data?.title || "文章不存在"}
+  post={data && safeHtml !== null ? data : undefined}
+  path={`/posts/${id}`}
+  keywords={data && safeHtml !== null ? [data.title, categoryName, ...tagNames].filter(Boolean).join(",") : undefined}
+>
+  {
+    data && (safeHtml !== null || locked) ? (
+      <>
+        <!-- 主色带(原版 post.php:min-height 140px 纯色) -->
+        <div class="dreamcat-content-header dreamcat-content-header--band" />
+
+        <div class="dc-container">
+          <!-- 内容卡上叠(原版 margin-top -15%,radius 9px) -->
+          <article class="dc-card dc-card--lg dreamcat-post-card">
+            <!-- 作者卡头(原版 mdui-card-header:头像 + 作者名 + 站点简介) -->
+            <header class="dreamcat-post-author">
+              {site?.authorLogo || site?.siteLogo ? (
+                <img class="dreamcat-post-author-avatar" src={site?.authorLogo || site?.siteLogo} alt={authorName || siteName} />
+              ) : (
+                <span class="dreamcat-post-author-avatar dc-avatar-ph">
+                  <Icon name="person" size={26} />
+                </span>
+              )}
+              <div class="dreamcat-post-author-text">
+                <div class="dreamcat-post-author-name">{authorName || siteName}</div>
+                <div class="dreamcat-post-author-desc">{site?.siteDesc || ""}</div>
+              </div>
+            </header>
+
+            <!-- 五色条(原版 di-color) -->
+            <FiveColorBar />
+
+            <!-- 标题 + chips 行(时间/字数/浏览,原版 card-primary) -->
+            <div class="dreamcat-post-primary">
+              <h1 class="dreamcat-post-title">{data.title}</h1>
+              <div class="dreamcat-post-chips">
+                <span class="dc-tagchip dreamcat-post-chip">
+                  <Icon name="schedule" size={13} />
+                  <time datetime={data.created}>{fmtDate(data.created)}</time>
+                </span>
+                <span class="dc-tagchip dreamcat-post-chip">
+                  <Icon name="description" size={13} />
+                  {stripMarkdown(data.content || "").length} 个字
+                </span>
+                {(data.viewCount ?? 0) > 0 && (
+                  <span class="dc-tagchip dreamcat-post-chip">
+                    <Icon name="visibility" size={13} />
+                    {data.viewCount}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div style="border-top: 1px dashed var(--dc-border); font-size: 14px;" />
+
+            <div class="dc-content-body">
+              {locked ? (
+                <form id="dc-unlock-form" style="display:flex;flex-direction:column;gap:12px;max-width:360px;margin:40px auto">
+                  <p style="margin:0;text-align:center;color:var(--dc-text-muted)">这篇文章被密码保护,请输入密码:</p>
+                  <input
+                    type="password"
+                    id="dc-unlock-password"
+                    required
+                    placeholder="密码"
+                    style="height:44px;padding:0 16px;border:1px solid var(--dc-border);border-radius:999px;background:var(--dc-surface);color:var(--dc-text);outline:none"
+                  />
+                  <button class="dc-btn" type="submit">解锁</button>
+                  <p id="dc-unlock-msg" style="margin:0;text-align:center;color:var(--dc-pink);font-size:13px;min-height:1em"></p>
+                </form>
+              ) : (
+                safeHtml !== null && <div set:html={safeHtml} />
+              )}
+            </div>
+
+            <!-- detail-info 版权(原版 1:1) -->
+            <p class="detail-info">
+              #如无特别声明,该文章均为 <a href={withBase("/about")}>{authorName || siteName}</a>
+              原创,转载请遵循 署名-非商业性使用 4.0 国际(CC BY-NC 4.0) 协议,即转载请注明文章来源。
+              <br />
+              #最后编辑时间为: {fmtDate(data.updated) || fmtDate(data.created)}
+            </p>
+          </article>
+        </div>
+      </>
+    ) : (
+      <div class="dc-card dc-card--lg" style="margin-top:28px">
+        <div class="dc-404">
+          <p class="dc-404__code">404</p>
+          <p class="dc-404__msg">文章不存在或未发布。</p>
+          <a class="dc-btn dc-btn--ghost" href={withBase("/")}>返回首页</a>
+        </div>
+      </div>
+    )
+  }
+
+  <div class="dc-container">
+    {
+      prePost || nextPost ? (
+        <nav class="dc-postnav">
+          {prePost ? (
+            <a href={withBase(`/posts/${prePost.id}`)}>
+              <Icon name="arrowLeft" size={20} />
+              <span>
+                <span class="dc-postnav__direction">上一篇</span>
+                <span class="dc-postnav__title">{prePost.title}</span>
+              </span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {nextPost ? (
+            <a class="is-next" href={withBase(`/posts/${nextPost.id}`)}>
+              <Icon name="arrowRight" size={20} />
+              <span>
+                <span class="dc-postnav__direction">下一篇</span>
+                <span class="dc-postnav__title">{nextPost.title}</span>
+              </span>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      ) : null
+    }
+
+    <Comments site={site ?? {}} path={`/posts/${articlePath(data?.pathname, id)}`} />
+  </div>
+
+  {showToc && hasToc && <Toc items={tocItems} />}
+  <PostEffects lightbox={showLightbox} clickHearts={showClickHearts} />
+</BaseLayout>
+
+<script is:inline define:vars={{ postId: id, path: `/posts/${id}` }}>
+  // 文章浏览计数:平台 Go 层 /api/vanblog/visits/record(原子 viewCount+1)。
+  if (document.querySelector("article")) {
+    ;(async () => {
+      try {
+        await fetch("/api/vanblog/visits/record", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path, postId }),
+        });
+      } catch {}
+    })();
+  }
+
+  // 密码解锁:POST 主题前缀 /api/unlock(prod 下必须经 /themes/<name>/ 挂载
+  // 前缀,caddy 才能把请求落回主题 SSR 而不是反代到 pb)。成功后 reload,
+  // 凭解锁 cookie 走 SSR 全量渲染。
+  (() => {
+    const form = document.getElementById("dc-unlock-form");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("dc-unlock-password");
+      const msg = document.getElementById("dc-unlock-msg");
+      const password = input instanceof HTMLInputElement ? input.value : "";
+      if (!password) return;
+      const mount = location.pathname.match(/^\/themes\/[^/]+/);
+      const prefix = mount ? mount[0] : "";
+      try {
+        const r = await fetch(`${prefix}/api/unlock`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: postId, password, basePath: mount ? mount[0] : "" }),
+        });
+        if (r.ok) {
+          location.reload();
+          return;
+        }
+        const j = await r.json().catch(() => null);
+        if (msg) msg.textContent = (j && j.message) || "密码错误！请重试！";
+      } catch {
+        if (msg) msg.textContent = "网络异常,请稍后重试";
+      }
+    });
+  })();
+</script>

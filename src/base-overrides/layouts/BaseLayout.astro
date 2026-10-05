@@ -1,0 +1,123 @@
+---
+// bare theme: 无样式的纯 HTML 布局覆盖。
+// 源自 commit aac5f2b3 的前端骨架风格。
+//
+// 保留以下 builtin 的契约要求（非样式相关）：
+// - FOUC 防护 inline script（dark mode class）
+// - palette.css link（site 级配置，theme 应尊重）
+// - canonical URL / SEO meta（从 builtin BaseLayout 继承）
+// - pack 贡献的 CSS/JS（site 级配置）
+//
+// ★ head 机制（FOUC / palette / OG / RSS / canonical / pack styles）继承自平台
+//   `app/src/layouts/partials/Head.astro`（经 `@vanblog/base/layouts/partials/Head.astro`），
+//   本文件只定制 body/nav/footer 与 favicon 兜底；平台 head 演进会自动传导，勿在此复制 head 逻辑。
+//
+// 去掉：
+// - Tailwind class
+// - Nav / Footer / BackToTop 组件（用纯 HTML nav 替代）
+// - JSON-LD（非必需）
+
+import { safe, stripMarkdown, buildPaletteTypeMap } from '@vanblog/sdk';
+import { getPackFrontend } from '@vanblog/base/lib/pack-frontend';
+import type { Site, Post } from '@vanblog/sdk';
+import themeMeta from '../../../theme.json';
+import Head from '@vanblog/base/layouts/partials/Head.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  site?: Partial<Site>;
+  post?: Post;
+  path?: string;
+}
+
+const { title, description, site: siteProp, post, path } = Astro.props;
+const site = siteProp || await Astro.locals.getSite();
+
+// Effective site palette: site.palette first, else this theme's recommendedPalette.
+const recommendedPalette = (themeMeta as { recommendedPalette?: string })?.recommendedPalette || null;
+const effectivePalette = site?.palette || recommendedPalette;
+
+// Default favicon: site.favicon or a minimal inline SVG (avoids /favicon.ico 404).
+const DEFAULT_FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231772b4'/%3E%3Ctext x='16' y='23' font-size='20' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'%3EV%3C/text%3E%3C/svg%3E";
+
+const siteName = site?.siteName || 'Vanblog';
+const siteDesc = description || site?.siteDesc || '';
+const baseUrl = site?.baseUrl || '';
+const canonicalURL = baseUrl && path ? `${baseUrl.replace(/\/$/, '')}${path}` : undefined;
+const desc = post ? stripMarkdown(post.content) || siteDesc : siteDesc;
+
+const packFrontend = await getPackFrontend(Astro.locals.pb);
+const packNavItems = packFrontend.packs.flatMap((pack) => pack.nav ? [pack.nav] : []);
+
+// Theme settings (same DSL/contract as the vanblog theme).
+const themeSettings = await Astro.locals.getThemeSettings();
+const footerText = typeof themeSettings.footerText === 'string' ? themeSettings.footerText.trim() : '';
+const bannerUrl = typeof themeSettings.bannerUrl === 'string' ? themeSettings.bannerUrl.trim() : '';
+const hasAbout = !!(site?.aboutContent && site.aboutContent.trim());
+const pb = Astro.locals.pb;
+const isLoggedIn = pb.authStore.isValid;
+
+// Palette init data: effective palette + name→type map (light/dark governed by the active palette's type)
+const paletteTypeMap = buildPaletteTypeMap(
+  (await safe(() => pb.vanblog.palettes.list(), 'palettes'))?.data ?? []
+);
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <Head
+      title={title}
+      description={desc}
+      canonicalURL={canonicalURL}
+      siteName={siteName}
+      favicon={site?.favicon || DEFAULT_FAVICON}
+      sitePalette={effectivePalette}
+      siteUpdated={site?.updated}
+      palettes={paletteTypeMap}
+      ogTitle={post?.title || title}
+      ogType={post ? 'article' : 'website'}
+    />
+  </head>
+  <body>
+    <header>
+      <a href="/">{siteName}</a>
+      <nav>
+        <a href="/">首页</a>
+        <a href="/archive">归档</a>
+        <a href="/timeline">时间轴</a>
+        <a href="/tags">标签</a>
+        <a href="/categories">分类</a>
+        {hasAbout && <a href="/about">关于</a>}
+        {packNavItems.map((item) => (
+          <a href={item.href}>{item.label}</a>
+        ))}
+        <a href="/search">搜索</a>
+        {isLoggedIn ? (
+          <a href="/admin">管理</a>
+        ) : (
+          <a href="/login">登录</a>
+        )}
+      </nav>
+    </header>
+    {bannerUrl && <img src={bannerUrl} alt="" style="display:block;margin:1rem auto 0;max-width:100%;" />}
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <hr />
+      {footerText && <p>{footerText}</p>}
+      <p>
+        {site?.copyrightAgreement || ''} {site?.author || ''}
+        {site?.since && ` · since ${new Date(site.since).getFullYear()}`}
+      </p>
+      <p>Powered by Vanblog</p>
+    </footer>
+
+    {packFrontend.contributions.filter((item) => item.scope === 'public').flatMap((item) => item.scripts).map((src) => (
+      <script is:inline type="module" src={src} data-vanblog-pack-script></script>
+    ))}
+  </body>
+</html>

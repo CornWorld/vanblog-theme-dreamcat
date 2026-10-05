@@ -1,0 +1,347 @@
+/* ============================================================
+   v2-classic.css —— DreamCat 2.x LTS (2.10.230801_LTS) 自定义样式表
+   逐字移植(src: DreamCat_StaticResources/css/style.css),类名原样保留。
+   仅做两类修订(均有注释):
+   1. 上游笔误修复: `border: 1 pxsolidvar(--border-color)` → 1px solid var(--dc-border)
+   2. 少量字面色改为 --dc-* token(页面底色/边框),便于暗色跟随;品牌常数保留字面
+   ============================================================ */
+
+.DreamCat-List-01 {
+  padding: 0px 0 !important;
+  margin: 0;
+  list-style: none;
+  background-color: transparent;
+}
+
+.DreamCat-List-02 {
+  border-radius: 0px;
+}
+
+.DreamCat-List-headimg {
+  width: 75px;
+  height: 75px;
+  margin-top: 35px;
+  margin-left: 30%;
+  border-radius: 50%;
+  background-size: cover !important;
+  background-position: center center !important;
+}
+
+.DreamCat-menu-bg {
+  width: 100%;
+  height: 185px;
+  position: relative !important;
+  background-size: cover !important;
+  background-position: 50% 50% !important;
+  background-repeat: no-repeat !important;
+}
+
+.DreamCat-menu-author {
+  display: block;
+  font-size: 20px;
+  line-height: 15px;
+}
+
+.DreamCat-main-pic {
+  height: 215px;
+  object-fit: cover;
+}
+
+.DreamCat-top-card {
+  height: 215px;
+}
+
+.DreamCat-top-card-a {
+  border-radius: 18px;
+  box-shadow:
+    0 6px 6px -3px rgb(0 0 0 / 20%),
+    0 10px 14px 1px rgb(0 0 0 / 14%),
+    0 4px 18px 3px rgb(0 0 0 / 12%);
+}
+
+.shadow-A1 {
+  box-shadow:
+    0.5rem 0.875rem 2.375rem rgb(39 44 49 / 6%),
+    0.0625rem 0.1875rem 0.5rem rgb(39 44 49 / 3%);
+}
+
+.button-ts:active {
+  transform: translateY(2px);
+  transition: box-shadow 2.5s;
+  box-shadow:
+    0.5rem 0.875rem 2.375rem rgb(255 255 255 / 12%),
+    0.0625rem 0.1875rem 0.5rem transparent;
+}
+
+.DreamCat-content-header {
+  min-height: 50px;
+  padding: 35px 50px 35px 80px;
+  color: #fff;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+}
+
+.DreamCat-footer {
+  padding: 10px 0;
+  background-color: #f6f6f6;
+}
+
+.DreamCat-infooter {
+  text-align: center;
+  margin: 0 auto;
+  font-size: 12px;
+  color: #999;
+}
+
+.moe-page-div {
+  max-width: 250px;
+  position: relative;
+  margin: 30px auto 80px;
+}
+
+.moe-page-div .moe-number {
+  left: 37%;
+  position: absolute;
+}
+
+.moe-page-div .moe-next {
+  right: 0;
+  position: absolute;
+}
+
+.moe-page-div .mdui-fab {
+  position: absolute;
+  left: 0;
+}
+
+.detail-info {
+  overflow: hidden;
+  padding: 10px 20px;
+  margin: 0;
+  border-top: 1px dashed #e0e0e0;
+  color: #626262;
+  font-size: 14px;
+  line-height: 19px;
+  background-color: #f6f6f6;
+}
+
+.detail-info a {
+  color: var(--dc-primary);
+}
+
+.di-color div {
+  width: 20%;
+  float: left;
+  height: 2px;
+}
+
+.di-color .di-color-a {
+  background-color: #f92672;
+}
+
+.di-color .di-color-b {
+  background-color: #fd971f;
+}
+
+.di-color .di-color-c {
+  background-color: #8acf00;
+}
+
+.di-color .di-color-d {
+  background-color: #0092ff;
+}
+
+.di-color .di-color-e {
+  background-color: #ae74ac;
+}
+
+.lis {
+  margin-top: 40px;
+}
+
+.spot {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: -60px;
+  transform: translateX(-50%);
+  background-color: #666666;
+  border: 4px solid #ffffff;
+  border-radius: 18px;
+}
+
+.g-lin {
+  width: 500px;
+  height: 4px;
+  background-color: #666666;
+  position: relative;
+  top: 12px;
+  z-index: -1;
+  margin-left: -400px;
+}
+
+.dc_icon {
+  width: 3em;
+  height: 2em;
+  fill: currentColor;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@media screen and (max-width: 760px) {
+  .DreamCat-content-header {
+    min-height: auto;
+    padding: 35px 16px;
+  }
+}
+
+#main {
+  overflow: hidden;
+}
+
+#line {
+  width: 4px;
+  height: 100%;
+  background-color: #666666;
+  position: absolute;
+  left: -60px;
+  transform: translateX(-50%);
+}
+
+.coos {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 16px;
+  transition: all 0.3s ease-out;
+}
+
+.Logo_centered {
+  display: flex;
+  justify-content: center;
+}
+
+.Logo_centered > img {
+  margin: -50px 0 0;
+  left: 0;
+}
+
+.page-content {
+  margin: 35px 0;
+  letter-spacing: 1px;
+  line-height: 1.8em;
+  word-wrap: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.page-content pre {
+  padding: 1em !important;
+  margin: 0.5em 0 !important;
+  overflow: auto !important;
+  border-radius: 0.4em !important;
+  background: #282a36;
+}
+
+.page-content pre code {
+  color: #f8f8f2 !important;
+  background: 0 0;
+  text-shadow: 0 1px rgb(0 0 0 / 30%);
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+}
+
+.page-content table {
+  display: table;
+  margin: 1.8em 0;
+  border: 1px solid var(--dc-border);
+  border-collapse: separate;
+  border-radius: 3px;
+  border-spacing: 0;
+}
+
+.page-content table th {
+  background-color: #eeeeee;
+  white-space: nowrap;
+}
+
+.page-content table tr {
+  background-color: #eeeeee1c;
+  white-space: nowrap;
+}
+
+.page-content table td,
+.page-content table th {
+  padding: 8px 13px;
+  border-top: 1px solid var(--dc-border);
+  border-right: 1px solid var(--dc-border);
+  border-radius: 0;
+}
+
+.page-content-img img {
+  width: 100%;
+}
+
+/* ── doc-footer-nav 上下篇(v2 post.php 内联样式移植) ────── */
+.doc-footer-nav {
+  height: 96px;
+  margin-top: 18px;
+}
+
+.doc-footer-nav-left,
+.doc-footer-nav-right {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  color: var(--dc-text);
+}
+
+.doc-footer-nav-left {
+  text-align: left;
+}
+
+.doc-footer-nav-right {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+.doc-footer-nav-text {
+  box-sizing: border-box;
+  display: inline-block;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
+  padding-top: 24px;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+.doc-footer-nav-text .doc-footer-nav-direction {
+  font-size: 15px;
+  line-height: 18px;
+  margin-bottom: 1px;
+  opacity: 0.55;
+}
+
+.doc-footer-nav-left .mdui-icon {
+  float: left;
+  margin-right: 10px;
+  padding-top: 23px;
+}
+
+.doc-footer-nav-right .mdui-icon {
+  float: right;
+  margin-left: 10px;
+  padding-top: 23px;
+}
+
+.doc-footer-nav-left .doc-footer-nav-chapter {
+  margin-left: 34px;
+}

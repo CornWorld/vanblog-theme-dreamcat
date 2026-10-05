@@ -65,30 +65,52 @@ for (const p of posts) {
 
   <div class="dc-container">
     <!-- 顶部双卡(原版 DreamCat-top-card 双卡) -->
-    <div class="dreamcat-top-grid">
-      <!-- 横幅大图卡(headbj1 → heroImageUrl;DC_Dec → bannerCaption) -->
-      <div
-        class="dreamcat-top-banner dc-card dc-card--lg dc-card--hover"
-        style={`background-image:url('${bannerUrl}'), linear-gradient(135deg, var(--dc-primary), color-mix(in srgb, var(--dc-primary) 55%, #000))`}
-      >
-        <span class="dreamcat-top-banner-caption">{bannerCaption || siteDesc || siteName}</span>
+    <div class="mdui-container"><div class="mdui-row">
+      
+      <!-- 横幅大图卡(v2 原结构: mdui-card-media + covered 标题条;headbj1/DC_Dec) -->
+      <div class="mdui-col-xs-12 mdui-col-sm-8">
+        <div class="mdui-card DreamCat-top-card shadow-A1" style="border-radius: 18px; overflow: hidden">
+          <div class="mdui-card-media">
+            {bannerUrl ? (
+              <img class="DreamCat-main-pic" src={bannerUrl} alt="" />
+            ) : (
+              <div class="DreamCat-main-pic" style="background-color: var(--dc-primary)" />
+            )}
+            <div class="mdui-card-media-covered">
+              <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">{bannerCaption || siteDesc || siteName}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- 作者卡(headbj2 → authorCoverUrl;头像叠出;DC_Decc → siteDesc;社交 icons) -->
-      <div class="dreamcat-top-author dc-card dc-card--lg dc-card--hover">
-        <div
-          class="dreamcat-top-author-cover"
-          style={authorCoverUrl ? `background-image:url('${authorCoverUrl}')` : undefined}
-        />
-        {avatar ? (
-          <img class="dreamcat-top-author-avatar" src={avatar} alt={site?.author || siteName} />
-        ) : (
-          <span class="dreamcat-top-author-avatar dc-avatar-ph">
-            <Icon name="person" size={40} />
-          </span>
-        )}
-        <div class="dreamcat-top-author-chip dc-tagchip">{siteDesc || "博主很懒,啥都没写"}</div>
-        <SocialLinks socials={site?.socials} />
+      <!-- 作者卡(v2 原结构: 封面 + 头像叠出 + chip 简介 + 社交 icons;headbj2/DC_Decc) -->
+      <div class="mdui-hidden-xs mdui-col-sm-4">
+        <div class="mdui-card DreamCat-top-card shadow-A1" style="border-radius: 18px; overflow: visible">
+          <div class="mdui-card-media">
+            {authorCoverUrl ? (
+              <img src={authorCoverUrl} alt="" style="height: 100px; width: 100%; object-fit: cover; display: block" />
+            ) : (
+              <div style="height: 100px; background-color: var(--dc-primary)" />
+            )}
+          </div>
+          <div class="Logo_centered">
+            {avatar ? (
+              <img class="DreamCat-List-headimg" src={avatar} alt={site?.author || siteName} style="margin-top: -50px; position: relative" />
+            ) : (
+              <span class="DreamCat-List-headimg dc-avatar-ph" style="margin-top: -50px; position: relative" />
+            )}
+          </div>
+          <div class="number" style="color: #999; font-size: 15px; display: flex; justify-content: center; margin: 1%">
+            <div class="mdui-chip">
+              <span class="mdui-chip-title">{siteDesc || "博主很懒,啥都没写"}</span>
+            </div>
+          </div>
+          <div style="text-align: center">
+            <SocialLinks socials={site?.socials} />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -104,22 +126,35 @@ for (const p of posts) {
             {listPosts.map((post) => (
               <PostCard post={post} />
             ))}
-            {timershaftPosts.map((post) => {
-              const opt = postMetaString(post?.meta, "timershaft_opt") ?? "";
-              return (
-                <article class="dreamcat-timer-card dc-card dc-card--hover">
-                  <div class="dreamcat-timer-card__tag">{TIMERSHAFT_NAMES[opt] ?? "公 告"}</div>
-                  <h2 class="dreamcat-timer-card__title">{post.title}</h2>
-                  <p class="dreamcat-timer-card__excerpt">{stripMarkdown(post.content || "", 520)}</p>
-                  <a
-                    class="dreamcat-timer-card__link"
-                    href={withBase(`/posts/${articlePath(post.pathname, post.id)}`)}
-                  >
-                    查看全文 →
-                  </a>
-                </article>
-              );
-            })}
+            <div id="main" style="position: relative">
+              <div id="line" />
+              {timershaftPosts.map((post) => {
+                const opt = postMetaString(post?.meta, "timershaft_opt") ?? "";
+                return (
+                  <div class="lis coos">
+                    <div class="spot" />
+                    <div class="g-lin mdui-hidden-sm-down" />
+                    <div
+                      class="mdui-card mdui-hoverable shadow-A1 dreamcat-timer-card"
+                      style="background-color: #e8e8e8; border-radius: 6px"
+                    >
+                      <div class="mdui-card-primary">
+                        <div class="mdui-card-primary-title" style="color: #282a36">{post.title}</div>
+                        <div class="mdui-card-primary-subtitle" style="color: #282a36">
+                          {stripMarkdown(post.content || "", 520)}
+                        </div>
+                      </div>
+                      <a
+                        class="dreamcat-timer-card__link"
+                        href={withBase(`/posts/${articlePath(post.pathname, post.id)}`)}
+                      >
+                        查看全文 →
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </>
         )
       }

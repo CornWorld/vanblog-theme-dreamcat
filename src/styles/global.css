@@ -21,6 +21,15 @@
 }
 
 @font-face {
+  /* Material Icons(mdui 组件 ligature 图标字体,上游 MIT) */
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./fonts/MaterialIcons-Regular.woff2") format("woff2");
+}
+
+@font-face {
   font-family: "Smiley Sans";
   font-style: normal;
   font-weight: 400;
@@ -819,75 +828,12 @@ html.dark .dc-card--hover:hover {
 }
 
 /* ── 分页 ─────────────────────────────────────────────── */
-.dc-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  max-width: 320px;
-  margin: 36px auto 12px;
-}
 
-.dc-pagination a,
-.dc-pagination span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 42px;
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: var(--dc-surface);
-  color: var(--dc-text);
-  font-size: 14px;
-  box-shadow: var(--dc-shadow);
-}
 
-.dc-pagination a:hover {
-  color: var(--dc-primary);
-}
 
-.dc-pagination .is-current {
-  background: var(--dc-primary);
-  color: var(--dc-on-primary);
-}
 
-.dc-pagination .is-disabled {
-  opacity: 0.45;
-  pointer-events: none;
-}
 
-/* ── 五色条 & 文章版权盒 ──────────────────────────────── */
-.dc-rainbow {
-  display: flex;
-  height: 3px;
-  overflow: hidden;
-}
 
-.dc-rainbow i {
-  flex: 1;
-}
-
-.dc-rainbow i:nth-child(1) {
-  background: #f92672;
-}
-
-.dc-rainbow i:nth-child(2) {
-  background: #fd971f;
-}
-
-.dc-rainbow i:nth-child(3) {
-  background: #8acf00;
-}
-
-.dc-rainbow i:nth-child(4) {
-  background: #0092ff;
-}
-
-.dc-rainbow i:nth-child(5) {
-  background: #ae74ac;
-}
 
 .dc-copyright {
   position: relative;
@@ -2120,40 +2066,6 @@ html.dark .mdui-snackbar {
   padding: 16px 20px 14px;
   background: var(--dc-surface-muted);
   border-radius: 6px;
-}
-
-.dreamcat-timer-card__tag {
-  display: inline-block;
-  margin-bottom: 8px;
-  padding: 2px 14px;
-  border-radius: 0 0 12px 12px;
-  background: var(--dc-border);
-  color: var(--dc-text-muted);
-  font-size: 13px;
-  letter-spacing: 0.3em;
-}
-
-.dreamcat-timer-card__title {
-  margin: 6px 0 4px;
-  color: #282a36;
-  font-size: 17px;
-  font-weight: 600;
-}
-
-html.dark .dreamcat-timer-card__title,
-html.dark .dreamcat-timer-card__excerpt {
-  color: var(--dc-text);
-}
-
-.dreamcat-timer-card__excerpt {
-  margin: 0 0 10px;
-  color: var(--dc-text-muted);
-  font-size: 14px;
-  line-height: 1.8;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .dreamcat-timer-card__link {

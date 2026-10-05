@@ -1,11 +1,11 @@
 ---
-// 社交图标行。数据源:平台 site.socials([{type, value}])。
-// 值语义对齐原版 DC_A_* 配置:
-// - 图片 URL(png/jpg/webp/gif)→ 点击弹 mdui Dialog 展示二维码(原版 QQ/微信/支付宝弹层)
-// - http(s) 链接 → 直链新开
-// - 邮箱 → mailto
-// - 其余(纯号码等)→ 非链接徽标
-import { resolveSocialIcon } from "../lib/socials";
+// 社交图标行(v2 1:1):图标来自原版 alifont SVG symbol 库
+// (public/js/alifont_2359325_loysvemas8m.js,与 Typecho 版同一份资产),
+// <svg class="dc_icon"><use href="#dc_icon*"/></svg> 引用,尺寸/对齐由
+// .dc_icon 统一控制(原版同款样式)。
+// 值语义:图片 URL → 点击弹二维码(原版 DC_A_* 弹窗);http 链接 → 直链;
+// 邮箱 → mailto;其余 → 非链接徽标。alifont 缺失的类型回落 material ligature。
+import Icon from "./Icon.astro";
 import type { SocialItem } from "@vanblog/sdk";
 
 interface Props {
@@ -13,29 +13,36 @@ interface Props {
   size?: number;
 }
 
-const { socials, size = 20 } = Astro.props;
+const { socials, size = 24 } = Astro.props;
 const items = (socials ?? []).filter((s) => s?.type && s?.value);
 const isImageUrl = (v: string) => /\.(png|jpe?g|webp|gif|bmp)(\?|#|$)/i.test(v);
+
+// type → alifont symbol id(缺省回落 material ligature)
+const SYMBOLS: Record<string, string> = {
+  qq: "#dc_iconQQ",
+  wechat: "#dc_iconweixin",
+  weibo: "#dc_icon552cd5bdeaada",
+  alipay: "#dc_iconzhifubao",
+  github: "#dc_icongithub",
+  linkedin: "#dc_iconlinkedin",
+};
 ---
 
 {
   items.length > 0 && (
     <div class="dc-social" id="dc-social-row">
       {items.map((s) => {
-        const icon = resolveSocialIcon(s.type);
         const qr = isImageUrl(s.value);
         const isHttp = /^https?:\/\//i.test(s.value);
         const isMail = s.type === "email" || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.value);
-        const svg = icon ? (
-          <svg width={size} height={size} viewBox={icon.viewBox} fill="currentColor" aria-hidden="true">
-            <Fragment set:html={icon.body} />
+        const symbol = SYMBOLS[s.type];
+        const svg = symbol ? (
+          <svg class="dc_icon" width={size} height={size} aria-hidden="true">
+            <use href={symbol} />
           </svg>
         ) : (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
-          </svg>
+          <Icon name={s.type === "email" ? "email" : "link"} size={size - 4} />
         );
-        // 二维码 → 弹层按钮(原版 DC_A_* 二维码弹窗);链接 → 直链;邮箱 → mailto;其余 → 徽标
         if (qr) {
           return (
             <button class="mdui-ripple" title={s.type} aria-label={s.type} data-dc-qr={s.value} data-dc-qr-type={s.type}>
@@ -45,14 +52,14 @@ const isImageUrl = (v: string) => /\.(png|jpe?g|webp|gif|bmp)(\?|#|$)/i.test(v);
         }
         if (isHttp) {
           return (
-            <a class="mdui-ripple" href={s.value} title={s.type} aria-label={s.type} target="_blank" rel="noopener noreferrer">
+            <a class="mdui-ripple" href={s.value} title={s.value} aria-label={s.type} target="_blank" rel="noopener noreferrer">
               {svg}
             </a>
           );
         }
         if (isMail) {
           return (
-            <a class="mdui-ripple" href={`mailto:${s.value}`} title={s.type} aria-label={s.type}>
+            <a class="mdui-ripple" href={`mailto:${s.value}`} title={s.value} aria-label={s.type}>
               {svg}
             </a>
           );
@@ -68,7 +75,7 @@ const isImageUrl = (v: string) => /\.(png|jpe?g|webp|gif|bmp)(\?|#|$)/i.test(v);
 }
 
 <script>
-  // 二维码弹层(原版 DC_A_* mdui-dialog 的移植;委托监听,动态内容亦生效)
+  // 二维码弹层(原版 DC_A_* mdui-dialog 的移植;委托监听)
   document.addEventListener("click", (e) => {
     const t = e.target as HTMLElement;
     const trigger = t.closest?.("[data-dc-qr]") as HTMLElement | null;

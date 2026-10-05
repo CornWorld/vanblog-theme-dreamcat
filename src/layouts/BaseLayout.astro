@@ -187,6 +187,9 @@ const websiteSchema = {
       </>
     )}
 
+    <!-- 原版 alifont SVG symbol 库(社交图标,与 Typecho 版同一份资产) -->
+    <script is:inline src={`${__VANBLOG_THEME_PREFIX__}/js/alifont_2359325_loysvemas8m.js`} defer></script>
+
     <!-- Pack 前端样式 + 站点级自定义注入(后台「自定义代码」) -->
     {packFrontend.contributions.filter((i) => i.scope === "public").flatMap((i) => i.styles).map((href) => (
       <link rel="stylesheet" href={href} data-vanblog-pack-style />

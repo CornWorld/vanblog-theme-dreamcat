@@ -243,32 +243,30 @@ const cover = postMetaString(data?.meta, "cover", "image", "ogImage");
 
   <div class="dc-container">
     {
-      prePost || nextPost ? (
-        <nav class="dc-postnav">
-          {prePost ? (
-            <a href={withBase(`/posts/${prePost.id}`)}>
-              <Icon name="arrowLeft" size={20} />
-              <span>
-                <span class="dc-postnav__direction">上一篇</span>
-                <span class="dc-postnav__title">{prePost.title}</span>
-              </span>
-            </a>
-          ) : (
-            <span />
-          )}
-          {nextPost ? (
-            <a class="is-next" href={withBase(`/posts/${nextPost.id}`)}>
-              <Icon name="arrowRight" size={20} />
-              <span>
-                <span class="dc-postnav__direction">下一篇</span>
-                <span class="dc-postnav__title">{nextPost.title}</span>
-              </span>
-            </a>
-          ) : (
-            <span />
-          )}
-        </nav>
-      ) : null
+      (prePost || nextPost) && (
+        <div class="doc-footer-nav mdui-color-grey-50">
+          <div class="dc-container mdui-row">
+            {prePost ? (
+              <a class="doc-footer-nav-left mdui-ripple" href={withBase(`/posts/${prePost.id}`)}>
+                <i class="mdui-icon material-icons">arrow_back</i>
+                <div class="doc-footer-nav-text">
+                  <div class="doc-footer-nav-direction">上一篇</div>
+                  <span class="doc-footer-nav-chapter">{prePost.title}</span>
+                </div>
+              </a>
+            ) : null}
+            {nextPost ? (
+              <a class="doc-footer-nav-right mdui-ripple" href={withBase(`/posts/${nextPost.id}`)}>
+                <i class="mdui-icon material-icons">arrow_forward</i>
+                <div class="doc-footer-nav-text" style="text-align: right">
+                  <div class="doc-footer-nav-direction">下一篇</div>
+                  <span class="doc-footer-nav-chapter">{nextPost.title}</span>
+                </div>
+              </a>
+            ) : null}
+          </div>
+        </div>
+      )
     }
 
     <Comments site={site ?? {}} path={`/posts/${articlePath(data?.pathname, id)}`} />

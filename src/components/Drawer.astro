@@ -1,11 +1,11 @@
 ---
-// 左侧抽屉:行为层 = mdui.Drawer(mdui-drawer 类;窄屏遮罩+swipe,≥1024px 常驻),
-// 皮肤层 = dc-drawer(宽度/背景/阴影)。品牌区与手风琴承接 2.x 结构。
-// 导航:site.nav 自定义优先(旗舰同语义:自定义整体替换默认集);
-// 默认集追加 pack 注册的导航项;RSS/后台按平台 displayOptions 开关。
+// 左侧抽屉(原版 header.php 抽屉结构 1:1):
+// mdui-list.DreamCat-List-01 + mdui-card.DreamCat-List-02 + DreamCat-menu-bg
+// (185px 品牌横图)+ Logo_centered 头像(75px, 上叠)+ covered 站名条 +
+// mdui-collapse 手风琴(归档/分类)+ mdui-divider + 文章数 chip。
 import Icon from "./Icon.astro";
 import { withBase } from "../lib/base";
-import type { Site, Category, PackNav } from "@vanblog/sdk";
+import type { Site, Category } from "@vanblog/sdk";
 
 interface Props {
   site: Partial<Site>;
@@ -13,7 +13,7 @@ interface Props {
   categories: Category[];
   postCount: number;
   currentPath: string;
-  packNavItems: PackNav[];
+  packNavItems: { label: string; href: string }[];
   showAdminButton: boolean;
   showRSS: boolean;
 }
@@ -30,10 +30,10 @@ const {
 } = Astro.props;
 
 const siteName = site?.siteName || "DreamCat";
-const avatar = site?.authorLogo || site?.siteLogo || "";
+const avatar = site?.authorLogo || site?.siteLogo || "/img/default-avatar.png";
 const brandStyle = drawerBgUrl
-  ? `background-image:url('${drawerBgUrl}')`
-  : "background-image:linear-gradient(135deg, var(--dc-primary), color-mix(in srgb, var(--dc-primary) 55%, #000))";
+  ? `background: url('${drawerBgUrl}')`
+  : "background: url('/img/brand.jpg')";
 
 const isActive = (href: string) =>
   href === "/" ? currentPath === "/" : currentPath.startsWith(href);
@@ -45,90 +45,117 @@ const customNav = (site?.nav ?? []).map((n) => ({
 }));
 ---
 
-<aside class="dc-drawer mdui-drawer mdui-drawer-left" id="dc-drawer">
-  <div class="dc-drawer-brand" style={brandStyle}>
-    {avatar ? (
-      <img class="dc-drawer-avatar" src={avatar} alt={siteName} loading="lazy" />
-    ) : (
-      <span class="dc-drawer-avatar dc-avatar-ph">
-        <Icon name="person" size={40} />
-      </span>
-    )}
-    <div class="dc-drawer-title">{siteName}</div>
-  </div>
+<div class="mc-drawer mdui-drawer mdui-drawer-left" id="dc-drawer">
+  <div class="mdui-list DreamCat-List-01">
+    <!-- 品牌卡(v2 原结构:menu-bg 横图 + covered 站名条 + 头像叠出) -->
+    <div class="mdui-card DreamCat-List-02" style="overflow: inherit;">
+      <div class="DreamCat-menu-bg" style={brandStyle}>
+        <div class="Logo_centered">
+          <img class="DreamCat-List-headimg" src={avatar} alt={siteName} loading="lazy" />
+        </div>
+        <div class="mdui-card-media-covered">
+          <div class="mdui-card-primary">
+            <div class="DreamCat-menu-author mdui-center" style="font-weight: 400; text-align: center;">
+              {siteName}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <nav class="dc-drawer-nav">
     {
       customNav.length > 0 ? (
         customNav.map((entry) => (
-          <a class:list={["dc-drawer-item", { "is-active": isActive(entry.href) }]} href={entry.href}>
-            <Icon name="description" />
-            <span>{entry.label}</span>
+          <a href={entry.href}>
+            <li class:list={["mdui-list-item mdui-ripple", { "mdui-list-item-active": isActive(entry.href) }]}>
+              <i class="mdui-list-item-icon mdui-icon material-icons">near_me</i>
+              <div class="mdui-list-item-content">{entry.label}</div>
+            </li>
           </a>
         ))
       ) : (
         <>
-          <a class:list={["dc-drawer-item", { "is-active": isActive("/") }]} href={withBase("/")}>
-            <Icon name="home" />
-            <span>首页</span>
+          <a href={withBase("/")}>
+            <li class:list={["mdui-list-item mdui-ripple", { "mdui-list-item-active": isActive("/") }]}>
+              <i class="mdui-list-item-icon mdui-icon material-icons">near_me</i>
+              <div class="mdui-list-item-content">首页</div>
+            </li>
           </a>
 
-          <details class="dc-drawer-group">
-            <summary>
-              <Icon name="archive" />
-              <span>归档</span>
-              <Icon name="arrowDown" class="dc-arrow" size={18} />
-            </summary>
-            <ul class="dc-drawer-sub">
-              <li><a href={withBase("/archive")}>全部文章</a></li>
-              <li><a href={withBase("/timeline")}>时间轴</a></li>
-            </ul>
-          </details>
+          <div class="mdui-collapse mdui-collapse-item">
+            <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+              <i class="mdui-list-item-icon mdui-icon material-icons">inbox</i>
+              <div class="mdui-list-item-content">归档</div>
+              <i class="mdui-collapse-item-arrow mdui-list-item-icon mdui-icon material-icons">keyboard_arrow_down</i>
+            </div>
+            <div class="mdui-collapse-item-body">
+              <ul class="mdui-list mdui-list-dense">
+                <li class="mdui-list-item mdui-ripple">
+                  <a class="mdui-list-item-content" href={withBase("/archive")}>全部文章</a>
+                </li>
+                <li class="mdui-list-item mdui-ripple">
+                  <a class="mdui-list-item-content" href={withBase("/timeline")}>时间轴</a>
+                </li>
+              </ul>
+            </div>
+          </div>
 
-          <details class="dc-drawer-group" open={isActive("/categories")}>
-            <summary>
-              <Icon name="folder" />
-              <span>分类</span>
-              <Icon name="arrowDown" class="dc-arrow" size={18} />
-            </summary>
-            <ul class="dc-drawer-sub">
-              {categories.length === 0 ? (
-                <li><a href={withBase("/categories")}>暂无分类</a></li>
-              ) : (
-                categories.map((c) => (
-                  <li>
-                    <a href={withBase(`/categories/${c.id}`)} title={c.name}>
-                      {c.name}
-                    </a>
+          <div class="mdui-collapse mdui-collapse-item">
+            <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+              <i class="mdui-list-item-icon mdui-icon material-icons">view_week</i>
+              <div class="mdui-list-item-content">分类</div>
+              <i class="mdui-collapse-item-arrow mdui-list-item-icon mdui-icon material-icons">keyboard_arrow_down</i>
+            </div>
+            <div class="mdui-collapse-item-body">
+              <ul class="mdui-list mdui-list-dense">
+                {categories.length === 0 ? (
+                  <li class="mdui-list-item mdui-ripple">
+                    <a class="mdui-list-item-content" href={withBase("/categories")}>暂无分类</a>
                   </li>
-                ))
-              )}
-            </ul>
-          </details>
+                ) : (
+                  categories.map((c) => (
+                    <li class="mdui-list-item mdui-ripple">
+                      <a class="mdui-list-item-content" href={withBase(`/categories/${c.id}`)} title={c.name}>
+                        {c.name}
+                      </a>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          </div>
 
-          <a class:list={["dc-drawer-item", { "is-active": isActive("/tags") }]} href={withBase("/tags")}>
-            <Icon name="tag" />
-            <span>标签</span>
+          <a href={withBase("/tags")}>
+            <li class:list={["mdui-list-item mdui-ripple", { "mdui-list-item-active": isActive("/tags") }]}>
+              <i class="mdui-list-item-icon mdui-icon material-icons">label</i>
+              <div class="mdui-list-item-content">标签</div>
+            </li>
           </a>
 
           {packNavItems.map((p) => (
-            <a class:list={["dc-drawer-item", { "is-active": isActive(p.href) }]} href={p.href}>
-              <Icon name="description" />
-              <span>{p.label}</span>
+            <a href={p.href}>
+              <li class:list={["mdui-list-item mdui-ripple", { "mdui-list-item-active": isActive(p.href) }]}>
+                <i class="mdui-list-item-icon mdui-icon material-icons">description</i>
+                <div class="mdui-list-item-content">{p.label}</div>
+              </li>
             </a>
           ))}
 
           {(site?.links?.length ?? 0) > 0 && (
-            <a class:list={["dc-drawer-item", { "is-active": isActive("/link") }]} href={withBase("/link")}>
-              <Icon name="link" />
-              <span>友链</span>
+            <a href={withBase("/link")}>
+              <li class:list={["mdui-list-item mdui-ripple", { "mdui-list-item-active": isActive("/link") }]}>
+                <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+                <div class="mdui-list-item-content">友链</div>
+              </li>
             </a>
           )}
 
           {site?.aboutContent && site.aboutContent.trim() && (
-            <a class:list={["dc-drawer-item", { "is-active": isActive("/about") }]} href={withBase("/about")}>
-              <Icon name="person" />
-              <span>关于</span>
+            <a href={withBase("/about")}>
+              <li class:list={["mdui-list-item mdui-ripple", { "mdui-list-item-active": isActive("/about") }]}>
+                <i class="mdui-list-item-icon mdui-icon material-icons">person</i>
+                <div class="mdui-list-item-content">关于</div>
+              </li>
             </a>
           )}
         </>
@@ -137,25 +164,46 @@ const customNav = (site?.nav ?? []).map((n) => ({
 
     {
       showRSS && (
-        <a class="dc-drawer-item" href={withBase("/api/feed.xml")} target="_blank" rel="noopener">
-          <Icon name="rss" />
-          <span>RSS</span>
+        <a href={withBase("/api/feed.xml")} target="_blank" rel="noopener">
+          <li class="mdui-list-item mdui-ripple">
+            <i class="mdui-list-item-icon mdui-icon material-icons">rss_feed</i>
+            <div class="mdui-list-item-content">RSS</div>
+          </li>
         </a>
       )
     }
 
     {
       showAdminButton && (
-        <a class="dc-drawer-item" href="/admin/" target="_blank" rel="noopener">
-          <Icon name="description" />
-          <span>后台</span>
+        <a href="/admin/" target="_blank" rel="noopener">
+          <li class="mdui-list-item mdui-ripple">
+            <i class="mdui-list-item-icon mdui-icon material-icons">account_box</i>
+            <div class="mdui-list-item-content">后台</div>
+          </li>
         </a>
       )
     }
-  </nav>
 
-  <div class="dc-drawer-meta">
-    <Icon name="description" size={14} />
-    文章 <b>{postCount}</b> 篇
+    <div class="mdui-divider" />
+
+    <a>
+      <li class="mdui-list-item">
+        <i class="mdui-list-item-icon mdui-icon material-icons">description</i>
+        <span class="mdui-list-item-content">文章</span>
+        <div class="mdui-chip">
+          <span class="mdui-chip-title">{postCount} 篇</span>
+        </div>
+      </li>
+    </a>
   </div>
-</aside>
+</div>
+
+<script>
+  // 当前所在分类时,展开抽屉分类手风琴(mdui collapse 初始态)
+  if (window.location.pathname.startsWith("/categories")) {
+    document.querySelectorAll("#dc-drawer .mdui-collapse-item").forEach((el) => {
+      const label = el.querySelector(".mdui-list-item-content");
+      if (label && label.textContent?.trim() === "分类") el.classList.add("mdui-collapse-item-open");
+    });
+  }
+</script>

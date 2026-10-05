@@ -1,0 +1,401 @@
+/**
+ * =============================================================================
+ * ************   Color 颜色   ************
+ * =============================================================================
+ */
+
+@global-primary-color-degrees-length: length(@globalPrimaryColorDegrees);
+@global-primary-colors-length: length(@globalPrimaryColors);
+@global-accent-color-degrees-length: length(@globalAccentColorDegrees);
+@global-accent-colors-length: length(@globalAccentColors);
+
+
+/**
+ * .mdui-theme-primary-[color] .mdui-color-theme
+ * .mdui-theme-primary-[color] .mdui-color-theme-[degree]
+ */
+
+& {
+  // 调色板变量定义: 运行时通过 body 上的 mdui-theme-* 类切换
+  .loop-primary-theme(@counter-color) when (@counter-color > 0) {
+    .loop-primary-theme((@counter-color - 1));
+    @colorName: extract(@globalPrimaryColors, @counter-color);
+
+    .mdui-theme-primary-@{colorName} when not (@colorName = null) {
+      .def-degree(@counter-degree) when (@counter-degree > 0) {
+        .def-degree((@counter-degree - 1));
+        @degree: extract(@globalPrimaryColorDegrees, @counter-degree);
+        @bg: 'color-@{colorName}-@{degree}';
+        @dark: 'color-@{colorName}-@{degree}-is-dark';
+        --mdui-primary-@{degree}: @@bg;
+        & when (@@dark = true) {
+          --mdui-primary-@{degree}-text: @color-white-text;
+        }
+        & when (@@dark = false) {
+          --mdui-primary-@{degree}-text: @color-black-text;
+        }
+      }
+      .def-degree(@global-primary-color-degrees-length);
+    }
+  }
+  .loop-primary-theme(@global-primary-colors-length);
+
+  .loop-accent-theme(@counter-color) when (@counter-color > 0) {
+    .loop-accent-theme((@counter-color - 1));
+    @colorName: extract(@globalAccentColors, @counter-color);
+
+    .mdui-theme-accent-@{colorName} when not (@colorName = null) {
+      @a100: 'color-@{colorName}-a100';
+      @a200: 'color-@{colorName}-a200';
+      @a400: 'color-@{colorName}-a400';
+      @a700: 'color-@{colorName}-a700';
+      @dark: 'color-@{colorName}-a200-is-dark';
+      --mdui-accent: @@a200;
+      --mdui-accent-text: @color-white-text;
+      & when (@@dark = true) {
+        --mdui-accent-text: @color-white-text;
+      }
+      & when (@@dark = false) {
+        --mdui-accent-text: @color-black-text;
+      }
+      --mdui-accent-a100: @@a100;
+      --mdui-accent-a200: @@a200;
+      --mdui-accent-a400: @@a400;
+      --mdui-accent-a700: @@a700;
+      --mdui-accent-a700-87: rgba(red(@@a700), green(@@a700), blue(@@a700), .87);
+    }
+  }
+  .loop-accent-theme(@global-accent-colors-length);
+}
+
+// 主题工具类: 单份规则 + var 引用
+.mdui-color-theme {
+  background-color: var(--mdui-primary-500) !important;
+  color: var(--mdui-primary-500-text) !important;
+}
+.mdui-color-theme-50 { background-color: var(--mdui-primary-50) !important; color: var(--mdui-primary-50-text) !important; }
+.mdui-color-theme-100 { background-color: var(--mdui-primary-100) !important; color: var(--mdui-primary-100-text) !important; }
+.mdui-color-theme-200 { background-color: var(--mdui-primary-200) !important; color: var(--mdui-primary-200-text) !important; }
+.mdui-color-theme-300 { background-color: var(--mdui-primary-300) !important; color: var(--mdui-primary-300-text) !important; }
+.mdui-color-theme-400 { background-color: var(--mdui-primary-400) !important; color: var(--mdui-primary-400-text) !important; }
+.mdui-color-theme-500 { background-color: var(--mdui-primary-500) !important; color: var(--mdui-primary-500-text) !important; }
+.mdui-color-theme-600 { background-color: var(--mdui-primary-600) !important; color: var(--mdui-primary-600-text) !important; }
+.mdui-color-theme-700 { background-color: var(--mdui-primary-700) !important; color: var(--mdui-primary-700-text) !important; }
+.mdui-color-theme-800 { background-color: var(--mdui-primary-800) !important; color: var(--mdui-primary-800-text) !important; }
+.mdui-color-theme-900 { background-color: var(--mdui-primary-900) !important; color: var(--mdui-primary-900-text) !important; }
+.mdui-color-theme-accent {
+  background-color: var(--mdui-accent) !important;
+  color: var(--mdui-accent-text) !important;
+}
+
+
+/**
+ * .mdui-color-[color]
+ * .mdui-color-[color]-[degree]
+ */
+
+& {
+  .loop-primary-theme(@counter-color) when (@counter-color > 0) {
+    .loop-primary-theme((@counter-color - 1));
+
+    @colorName: extract(@globalPrimaryColors, @counter-color);
+
+    & {
+      // .mdui-color-[color]
+      .mdui-color-@{colorName} when not (@colorName = null) {
+        .mdui-color(@colorName) !important;
+      }
+
+      .loop-primary-degree-theme(@counter-degree) when (@counter-degree > 0) {
+        .loop-primary-degree-theme((@counter-degree - 1));
+
+        @degree: extract(@globalPrimaryColorDegrees, @counter-degree);
+
+        // .mdui-color-[color]-[degree]
+        .mdui-color-@{colorName}-@{degree} when not (@degree = null) {
+          .mdui-color(@colorName, @degree) !important;
+        }
+      }
+      .loop-primary-degree-theme(@global-primary-color-degrees-length);
+    }
+  }
+  .loop-primary-theme(@global-primary-colors-length);
+}
+
+
+/**
+ * .mdui-color-[color]-accent
+ * .mdui-color-[color]-[degree]
+ */
+
+& {
+  .loop-accent-theme(@counter-color) when (@counter-color > 0) {
+    .loop-accent-theme((@counter-color - 1));
+
+    @colorName: extract(@globalAccentColors, @counter-color);
+
+    &{
+      // .mdui-color-[color]-accent
+      .mdui-color-@{colorName}-accent when not (@colorName = null) {
+        .mdui-color(@colorName, a200) !important;
+      }
+
+      .loop-accent-degree-theme(@counter-degree) when (@counter-degree > 0) {
+        .loop-accent-degree-theme((@counter-degree - 1));
+
+        @degree: extract(@globalAccentColorDegrees, @counter-degree);
+
+        // .mdui-color-[color]-[degree]
+        .mdui-color-@{colorName}-@{degree} when not (@degree = null) {
+          .mdui-color(@colorName, @degree) !important;
+        }
+      }
+      .loop-accent-degree-theme(@global-accent-color-degrees-length);
+    }
+  }
+  .loop-accent-theme(@global-accent-colors-length);
+}
+
+
+/**
+ * .mdui-color-black
+ * .mdui-color-white
+ * .mdui-color-transparent
+ */
+
+.mdui-color-black {
+  color: @color-white-text !important;
+  background-color: @color-black !important;
+}
+
+.mdui-color-white {
+  color: @color-black-text !important;
+  background-color: @color-white !important;
+}
+
+.mdui-color-transparent {
+  background-color: @color-transparent !important;
+}
+
+
+/**
+ * .mdui-theme-primary-[color] .mdui-text-color-theme
+ * .mdui-theme-primary-[color] .mdui-text-color-theme-[degree]
+ */
+
+& {
+  .loop-primary-theme(@counter-color) when (@counter-color > 0) {
+    .loop-primary-theme((@counter-color - 1));
+
+    @colorName: extract(@globalPrimaryColors, @counter-color);
+
+    .mdui-theme-primary-@{colorName} when not (@colorName = null) {
+
+      // .mdui-theme-primary-[color] .mdui-text-color-theme
+      .mdui-text-color-theme {
+        .mdui-text-color(@colorName) !important;
+      }
+
+      .loop-primary-degree-theme(@counter-degree) when (@counter-degree > 0) {
+        .loop-primary-degree-theme((@counter-degree - 1));
+
+        @degree: extract(@globalPrimaryColorDegrees, @counter-degree);
+
+        // .mdui-theme-primary-[color] .mdui-text-color-theme-[degree]
+        .mdui-text-color-theme-@{degree} when not (@degree = null) {
+          .mdui-text-color(@colorName, @degree) !important;
+        }
+      }
+      .loop-primary-degree-theme(@global-primary-color-degrees-length);
+    }
+  }
+  .loop-primary-theme(@global-primary-colors-length);
+}
+
+
+/**
+ * .mdui-theme-accent-[color] .mdui-text-color-theme-accent
+ * .mdui-theme-accent-[color] .mdui-text-color-theme-[degree]
+ */
+
+& {
+  .loop-accent-theme(@counter-color) when (@counter-color > 0) {
+    .loop-accent-theme((@counter-color - 1));
+
+    @colorName: extract(@globalAccentColors, @counter-color);
+
+    .mdui-theme-accent-@{colorName} when not (@colorName = null) {
+
+      // .mdui-theme-accent-[color] .mdui-text-color-theme-accent
+      .mdui-text-color-theme-accent {
+        .mdui-text-color(@colorName, a200) !important;
+      }
+
+      .loop-accent-degree-theme(@counter-degree) when (@counter-degree > 0) {
+        .loop-accent-degree-theme((@counter-degree - 1));
+
+        @degree: extract(@globalAccentColorDegrees, @counter-degree);
+
+        // .mdui-theme-accent-[color] .mdui-text-color-theme-[degree]
+        .mdui-text-color-theme-@{degree} when not (@degree = null) {
+          .mdui-text-color(@colorName, @degree) !important;
+        }
+      }
+      .loop-accent-degree-theme(@global-accent-color-degrees-length);
+    }
+  }
+  .loop-accent-theme(@global-accent-colors-length);
+}
+
+
+/**
+ * .mdui-text-color-[color]
+ * .mdui-text-color-[color]-[degree]
+ */
+
+& {
+  .loop-primary-theme(@counter-color) when (@counter-color > 0) {
+    .loop-primary-theme((@counter-color - 1));
+
+    @colorName: extract(@globalPrimaryColors, @counter-color);
+
+    &{
+      // .mdui-text-color-[color]
+      .mdui-text-color-@{colorName} when not (@colorName = null) {
+        .mdui-text-color(@colorName) !important;
+      }
+
+      .loop-primary-degree-theme(@counter-degree) when (@counter-degree > 0) {
+        .loop-primary-degree-theme((@counter-degree - 1));
+
+        @degree: extract(@globalPrimaryColorDegrees, @counter-degree);
+
+        // .mdui-text-color-[color]-[degree]
+        .mdui-text-color-@{colorName}-@{degree} when not (@degree = null) {
+          .mdui-text-color(@colorName, @degree) !important;
+        }
+      }
+      .loop-primary-degree-theme(@global-primary-color-degrees-length);
+    }
+  }
+  .loop-primary-theme(@global-primary-colors-length);
+}
+
+
+/**
+ * .mdui-text-color-[color]-accent
+ * .mdui-text-color-[color]-[degree]
+ */
+
+& {
+  .loop-accent-theme(@counter-color) when (@counter-color > 0) {
+    .loop-accent-theme((@counter-color - 1));
+
+    @colorName: extract(@globalAccentColors, @counter-color);
+
+    &{
+      // .mdui-text-color-[color]-accent
+      .mdui-text-color-@{colorName}-accent when not (@colorName = null) {
+        .mdui-text-color(@colorName, a200) !important;
+      }
+
+      .loop-accent-degree-theme(@counter-degree) when (@counter-degree > 0) {
+        .loop-accent-degree-theme((@counter-degree - 1));
+
+        @degree: extract(@globalAccentColorDegrees, @counter-degree);
+
+        // .mdui-text-color-[color]-[degree]
+        .mdui-text-color-@{colorName}-@{degree} when not (@degree = null) {
+          .mdui-text-color(@colorName, @degree) !important;
+        }
+      }
+      .loop-accent-degree-theme(@global-accent-color-degrees-length);
+    }
+  }
+  .loop-accent-theme(@global-accent-colors-length);
+}
+
+
+/**
+ * .mdui-text-color-black
+ * .mdui-text-color-black-[]
+ * .mdui-text-color-theme-[]
+ */
+
+.mdui-text-color-black {
+  color: @color-black !important;
+}
+.mdui-text-color-black-text,
+.mdui-text-color-theme-text {
+  color: @color-black-text !important;
+}
+.mdui-text-color-black-secondary,
+.mdui-text-color-theme-secondary {
+  color: @color-black-secondary !important;
+}
+.mdui-text-color-black-disabled,
+.mdui-text-color-theme-disabled {
+  color: @color-black-disabled !important;
+}
+.mdui-text-color-black-divider,
+.mdui-text-color-theme-divider {
+  color: @color-black-divider !important;
+}
+.mdui-text-color-black-icon,
+.mdui-text-color-theme-icon {
+  color: @color-black-icon !important;
+}
+.mdui-text-color-black-icon-disabled,
+.mdui-text-color-theme-icon-disabled {
+  color: @color-black-icon-disabled !important;
+}
+
+/**
+ * .mdui-text-color-white
+ * .mdui-text-color-white-[]
+ */
+.mdui-text-color-white {
+  color: @color-white !important;
+}
+.mdui-text-color-white-text {
+  color: @color-white-text !important;
+}
+.mdui-text-color-white-secondary {
+  color: @color-white-secondary !important;
+}
+.mdui-text-color-white-disabled {
+  color: @color-white-disabled !important;
+}
+.mdui-text-color-white-divider {
+  color: @color-white-divider !important;
+}
+.mdui-text-color-white-icon {
+  color: @color-white-icon !important;
+}
+.mdui-text-color-white-icon-disabled {
+  color: @color-white-icon-disabled !important;
+}
+
+/**
+ * .mdui-text-color-theme-[] 深色主题
+ */
+.layout-theme({
+  .mdui-text-color-theme-text {
+    color: @color-white-text !important;
+  }
+  .mdui-text-color-theme-secondary {
+    color: @color-white-secondary !important;
+  }
+  .mdui-text-color-theme-disabled {
+    color: @color-white-disabled !important;
+  }
+  .mdui-text-color-theme-divider {
+    color: @color-white-divider !important;
+  }
+  .mdui-text-color-theme-icon {
+    color: @color-white-icon !important;
+  }
+  .mdui-text-color-theme-icon-disabled {
+    color: @color-white-icon-disabled !important;
+  }
+});

@@ -1,0 +1,29 @@
+{
+  "name": "@vanblog/mdui-lite",
+  "version": "1.0.2-dreamcat.1",
+  "private": true,
+  "type": "module",
+  "description": "mdui 1.0.2 的 DreamCat 裁剪 fork: 只保留 drawer/dialog/snackbar/ripple/collapse 五个交互件。上游 mdui 1.x 已冻结, 本包按维护章程自养。",
+  "license": "MIT",
+  "main": "./dist/mdui-lite.js",
+  "exports": {
+    ".": "./dist/mdui-lite.js",
+    "./dist/mdui-lite.css": "./dist/mdui-lite.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "mdui.jq": "^2.0.1",
+    "normalize.css": "^8.0.1"
+  },
+  "devDependencies": {
+    "less": "^4.2.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0"
+  }
+}

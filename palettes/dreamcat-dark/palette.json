@@ -1,0 +1,8 @@
+{
+  "name": "dreamcat-dark",
+  "label": "DreamCat 经典 · 暗",
+  "type": "dark",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 2.x 暗色: MDUI 暗色规范 (#303030 底 / #424242 面) + 亮靛蓝 (indigo-300 #7986cb), 配合 dreamcat 主题使用"
+}

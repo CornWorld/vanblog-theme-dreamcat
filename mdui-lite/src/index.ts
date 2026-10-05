@@ -21,6 +21,11 @@ import './components/textfield';
 import './components/menu';
 import './components/menu/customAttr';
 import './components/snackbar';
+import './components/slider';
+import './components/bottom_nav';
+import './components/table';
+import './components/panel';
+import './components/panel/customAttr';
 import './components/headroom';
 import './components/headroom/customAttr';
 import './components/tab';
@@ -34,6 +39,6 @@ import './components/select/customAttr';
 import './index.less';
 
 // 全局暴露: 与上游 UMD 产物行为一致。DreamCat 等 PHP 主题无构建器, 经 window.mdui 使用。
-globalThis.mdui = mdui;
+(globalThis as unknown as { mdui: unknown }).mdui = mdui;
 
 export default mdui;

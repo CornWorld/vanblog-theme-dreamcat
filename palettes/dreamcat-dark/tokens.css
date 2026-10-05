@@ -1,0 +1,11 @@
+/* DreamCat 经典暗色调色盘
+ * 来源: MDUI 暗色主题规范 (dark bg #303030 / surface #424242),
+ * 主色用 Material indigo-300 提亮保证暗底对比度。 */
+html.dark {
+  --color-bg-dark: #303030;        /* MDUI 暗色页面背景 */
+  --color-surface-dark: #424242;   /* MDUI 暗色卡片表面 */
+  --color-text-dark: #eeeeee;      /* 主文字 */
+  --color-text-muted-dark: #9e9e9e;/* MDUI grey-500 次要文字 */
+  --color-border-dark: #575759;    /* 边框 */
+  --color-accent-dark: #7986cb;    /* Material indigo-300 */
+}

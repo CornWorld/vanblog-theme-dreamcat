@@ -11,84 +11,50 @@
 
 
 /**
- * .mdui-theme-primary-[color] .mdui-color-theme
- * .mdui-theme-primary-[color] .mdui-color-theme-[degree]
+ * primary 调色板变量 + 工具类 (var 层)
  */
+.mdui-theme-primary-indigo{--mdui-primary-50:#e8eaf6;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#c5cae9;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#9fa8da;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#7986cb;--mdui-primary-300-text:#fff;--mdui-primary-400:#5c6bc0;--mdui-primary-400-text:#fff;--mdui-primary-500:#3f51b5;--mdui-primary-500-text:#fff;--mdui-primary-600:#3949ab;--mdui-primary-600-text:#fff;--mdui-primary-700:#303f9f;--mdui-primary-700-text:#fff;--mdui-primary-800:#283593;--mdui-primary-800-text:#fff;--mdui-primary-900:#1a237e;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-blue{--mdui-primary-50:#e3f2fd;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#bbdefb;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#90caf9;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#64b5f6;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#42a5f5;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#2196f3;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#1e88e5;--mdui-primary-600-text:#fff;--mdui-primary-700:#1976d2;--mdui-primary-700-text:#fff;--mdui-primary-800:#1565c0;--mdui-primary-800-text:#fff;--mdui-primary-900:#0d47a1;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-light-blue{--mdui-primary-50:#e1f5fe;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#b3e5fc;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#81d4fa;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#4fc3f7;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#29b6f6;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#03a9f4;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#039be5;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#0288d1;--mdui-primary-700-text:#fff;--mdui-primary-800:#0277bd;--mdui-primary-800-text:#fff;--mdui-primary-900:#01579b;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-cyan{--mdui-primary-50:#e0f7fa;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#b2ebf2;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#80deea;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#4dd0e1;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#26c6da;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#00bcd4;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#00acc1;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#0097a7;--mdui-primary-700-text:#fff;--mdui-primary-800:#00838f;--mdui-primary-800-text:#fff;--mdui-primary-900:#006064;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-teal{--mdui-primary-50:#e0f2f1;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#b2dfdb;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#80cbc4;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#4db6ac;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#26a69a;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#009688;--mdui-primary-500-text:#fff;--mdui-primary-600:#00897b;--mdui-primary-600-text:#fff;--mdui-primary-700:#00796b;--mdui-primary-700-text:#fff;--mdui-primary-800:#00695c;--mdui-primary-800-text:#fff;--mdui-primary-900:#004d40;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-green{--mdui-primary-50:#e8f5e9;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#c8e6c9;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#a5d6a7;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#81c784;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#66bb6a;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#4caf50;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#43a047;--mdui-primary-600-text:#fff;--mdui-primary-700:#388e3c;--mdui-primary-700-text:#fff;--mdui-primary-800:#2e7d32;--mdui-primary-800-text:#fff;--mdui-primary-900:#1b5e20;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-light-green{--mdui-primary-50:#f1f8e9;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#dcedc8;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#c5e1a5;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#aed581;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#9ccc65;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#8bc34a;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#7cb342;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#689f38;--mdui-primary-700-text:rgba(0,0,0,.87);--mdui-primary-800:#558b2f;--mdui-primary-800-text:#fff;--mdui-primary-900:#33691e;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-lime{--mdui-primary-50:#f9fbe7;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#f0f4c3;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#e6ee9c;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#dce775;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#d4e157;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#cddc39;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#c0ca33;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#afb42b;--mdui-primary-700-text:rgba(0,0,0,.87);--mdui-primary-800:#9e9d24;--mdui-primary-800-text:rgba(0,0,0,.87);--mdui-primary-900:#827717;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-yellow{--mdui-primary-50:#fffde7;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#fff9c4;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#fff59d;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#fff176;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#ffee58;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#ffeb3b;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#fdd835;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#fbc02d;--mdui-primary-700-text:rgba(0,0,0,.87);--mdui-primary-800:#f9a825;--mdui-primary-800-text:rgba(0,0,0,.87);--mdui-primary-900:#f57f17;--mdui-primary-900-text:rgba(0,0,0,.87)}
+.mdui-theme-primary-amber{--mdui-primary-50:#fff8e1;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#ffecb3;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#ffe082;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#ffd54f;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#ffca28;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#ffc107;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#ffb300;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#ffa000;--mdui-primary-700-text:rgba(0,0,0,.87);--mdui-primary-800:#ff8f00;--mdui-primary-800-text:rgba(0,0,0,.87);--mdui-primary-900:#ff6f00;--mdui-primary-900-text:rgba(0,0,0,.87)}
+.mdui-theme-primary-orange{--mdui-primary-50:#fff3e0;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#ffe0b2;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#ffcc80;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#ffb74d;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#ffa726;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#ff9800;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#fb8c00;--mdui-primary-600-text:rgba(0,0,0,.87);--mdui-primary-700:#f57c00;--mdui-primary-700-text:rgba(0,0,0,.87);--mdui-primary-800:#ef6c00;--mdui-primary-800-text:rgba(0,0,0,.87);--mdui-primary-900:#e65100;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-deep-orange{--mdui-primary-50:#fbe9e7;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#ffccbc;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#ffab91;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#ff8a65;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#ff7043;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#ff5722;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#f4511e;--mdui-primary-600-text:#fff;--mdui-primary-700:#e64a19;--mdui-primary-700-text:#fff;--mdui-primary-800:#d84315;--mdui-primary-800-text:#fff;--mdui-primary-900:#bf360c;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-red{--mdui-primary-50:#ffebee;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#ffcdd2;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#ef9a9a;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#e57373;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#ef5350;--mdui-primary-400-text:#fff;--mdui-primary-500:#f44336;--mdui-primary-500-text:#fff;--mdui-primary-600:#e53935;--mdui-primary-600-text:#fff;--mdui-primary-700:#d32f2f;--mdui-primary-700-text:#fff;--mdui-primary-800:#c62828;--mdui-primary-800-text:#fff;--mdui-primary-900:#b71c1c;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-pink{--mdui-primary-50:#fce4ec;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#f8bbd0;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#f48fb1;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#f06292;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#ec407a;--mdui-primary-400-text:#fff;--mdui-primary-500:#e91e63;--mdui-primary-500-text:#fff;--mdui-primary-600:#d81b60;--mdui-primary-600-text:#fff;--mdui-primary-700:#c2185b;--mdui-primary-700-text:#fff;--mdui-primary-800:#ad1457;--mdui-primary-800-text:#fff;--mdui-primary-900:#880e4f;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-purple{--mdui-primary-50:#f3e5f5;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#e1bee7;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#ce93d8;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#ba68c8;--mdui-primary-300-text:#fff;--mdui-primary-400:#ab47bc;--mdui-primary-400-text:#fff;--mdui-primary-500:#9c27b0;--mdui-primary-500-text:#fff;--mdui-primary-600:#8e24aa;--mdui-primary-600-text:#fff;--mdui-primary-700:#7b1fa2;--mdui-primary-700-text:#fff;--mdui-primary-800:#6a1b9a;--mdui-primary-800-text:#fff;--mdui-primary-900:#4a148c;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-deep-purple{--mdui-primary-50:#ede7f6;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#d1c4e9;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#b39ddb;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#9575cd;--mdui-primary-300-text:#fff;--mdui-primary-400:#7e57c2;--mdui-primary-400-text:#fff;--mdui-primary-500:#673ab7;--mdui-primary-500-text:#fff;--mdui-primary-600:#5e35b1;--mdui-primary-600-text:#fff;--mdui-primary-700:#512da8;--mdui-primary-700-text:#fff;--mdui-primary-800:#4527a0;--mdui-primary-800-text:#fff;--mdui-primary-900:#311b92;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-brown{--mdui-primary-50:#efebe9;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#d7ccc8;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#bcaaa4;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#a1887f;--mdui-primary-300-text:#fff;--mdui-primary-400:#8d6e63;--mdui-primary-400-text:#fff;--mdui-primary-500:#795548;--mdui-primary-500-text:#fff;--mdui-primary-600:#6d4c41;--mdui-primary-600-text:#fff;--mdui-primary-700:#5d4037;--mdui-primary-700-text:#fff;--mdui-primary-800:#4e342e;--mdui-primary-800-text:#fff;--mdui-primary-900:#3e2723;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-grey{--mdui-primary-50:#fafafa;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#f5f5f5;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#eee;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#e0e0e0;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#bdbdbd;--mdui-primary-400-text:rgba(0,0,0,.87);--mdui-primary-500:#9e9e9e;--mdui-primary-500-text:rgba(0,0,0,.87);--mdui-primary-600:#757575;--mdui-primary-600-text:#fff;--mdui-primary-700:#616161;--mdui-primary-700-text:#fff;--mdui-primary-800:#424242;--mdui-primary-800-text:#fff;--mdui-primary-900:#212121;--mdui-primary-900-text:#fff}
+.mdui-theme-primary-blue-grey{--mdui-primary-50:#eceff1;--mdui-primary-50-text:rgba(0,0,0,.87);--mdui-primary-100:#cfd8dc;--mdui-primary-100-text:rgba(0,0,0,.87);--mdui-primary-200:#b0bec5;--mdui-primary-200-text:rgba(0,0,0,.87);--mdui-primary-300:#90a4ae;--mdui-primary-300-text:rgba(0,0,0,.87);--mdui-primary-400:#78909c;--mdui-primary-400-text:#fff;--mdui-primary-500:#607d8b;--mdui-primary-500-text:#fff;--mdui-primary-600:#546e7a;--mdui-primary-600-text:#fff;--mdui-primary-700:#455a64;--mdui-primary-700-text:#fff;--mdui-primary-800:#37474f;--mdui-primary-800-text:#fff;--mdui-primary-900:#263238;--mdui-primary-900-text:#fff}
 
-& {
-  // 调色板变量定义: 运行时通过 body 上的 mdui-theme-* 类切换
-  .loop-primary-theme(@counter-color) when (@counter-color > 0) {
-    .loop-primary-theme((@counter-color - 1));
-    @colorName: extract(@globalPrimaryColors, @counter-color);
+.mdui-color-theme{background-color:var(--mdui-primary-500)!important;color:var(--mdui-primary-500-text)!important}.mdui-color-theme-50{background-color:var(--mdui-primary-50)!important;color:var(--mdui-primary-50-text)!important}.mdui-color-theme-100{background-color:var(--mdui-primary-100)!important;color:var(--mdui-primary-100-text)!important}.mdui-color-theme-200{background-color:var(--mdui-primary-200)!important;color:var(--mdui-primary-200-text)!important}.mdui-color-theme-300{background-color:var(--mdui-primary-300)!important;color:var(--mdui-primary-300-text)!important}.mdui-color-theme-400{background-color:var(--mdui-primary-400)!important;color:var(--mdui-primary-400-text)!important}.mdui-color-theme-600{background-color:var(--mdui-primary-600)!important;color:var(--mdui-primary-600-text)!important}.mdui-color-theme-700{background-color:var(--mdui-primary-700)!important;color:var(--mdui-primary-700-text)!important}.mdui-color-theme-800{background-color:var(--mdui-primary-800)!important;color:var(--mdui-primary-800-text)!important}.mdui-color-theme-900{background-color:var(--mdui-primary-900)!important;color:var(--mdui-primary-900-text)!important}
+/**
+ * accent 调色板变量 + 工具类 (var 层)
+ */
+.mdui-theme-accent-pink{--mdui-accent:#ff4081;--mdui-accent-a200:#ff4081;--mdui-accent-a100:#ff80ab;--mdui-accent-a400:#f50057;--mdui-accent-a700:#c51162}
+.mdui-theme-accent-red{--mdui-accent:#ff5252;--mdui-accent-a200:#ff5252;--mdui-accent-a100:#ff8a80;--mdui-accent-a400:#ff1744;--mdui-accent-a700:#d50000}
+.mdui-theme-accent-purple{--mdui-accent:#e040fb;--mdui-accent-a200:#e040fb;--mdui-accent-a100:#ea80fc;--mdui-accent-a400:#d500f9;--mdui-accent-a700:#a0f}
+.mdui-theme-accent-deep-purple{--mdui-accent:#7c4dff;--mdui-accent-a200:#7c4dff;--mdui-accent-a100:#b388ff;--mdui-accent-a400:#651fff;--mdui-accent-a700:#6200ea}
+.mdui-theme-accent-indigo{--mdui-accent:#536dfe;--mdui-accent-a200:#536dfe;--mdui-accent-a100:#8c9eff;--mdui-accent-a400:#3d5afe;--mdui-accent-a700:#304ffe}
+.mdui-theme-accent-blue{--mdui-accent:#448aff;--mdui-accent-a200:#448aff;--mdui-accent-a100:#82b1ff;--mdui-accent-a400:#2979ff;--mdui-accent-a700:#2962ff}
+.mdui-theme-accent-light-blue{--mdui-accent:#40c4ff;--mdui-accent-a200:#40c4ff;--mdui-accent-a100:#80d8ff;--mdui-accent-a400:#00b0ff;--mdui-accent-a700:#0091ea}
+.mdui-theme-accent-cyan{--mdui-accent:#18ffff;--mdui-accent-a200:#18ffff;--mdui-accent-a100:#84ffff;--mdui-accent-a400:#00e5ff;--mdui-accent-a700:#00b8d4}
+.mdui-theme-accent-teal{--mdui-accent:#64ffda;--mdui-accent-a200:#64ffda;--mdui-accent-a100:#a7ffeb;--mdui-accent-a400:#1de9b6;--mdui-accent-a700:#00bfa5}
+.mdui-theme-accent-green{--mdui-accent:#69f0ae;--mdui-accent-a200:#69f0ae;--mdui-accent-a100:#b9f6ca;--mdui-accent-a400:#00e676;--mdui-accent-a700:#00c853}
+.mdui-theme-accent-light-green{--mdui-accent:#b2ff59;--mdui-accent-a200:#b2ff59;--mdui-accent-a100:#ccff90;--mdui-accent-a400:#76ff03;--mdui-accent-a700:#64dd17}
+.mdui-theme-accent-lime{--mdui-accent:#eeff41;--mdui-accent-a200:#eeff41;--mdui-accent-a100:#f4ff81;--mdui-accent-a400:#c6ff00;--mdui-accent-a700:#aeea00}
+.mdui-theme-accent-yellow{--mdui-accent:#ff0;--mdui-accent-a200:#ff0;--mdui-accent-a100:#ffff8d;--mdui-accent-a400:#ffea00;--mdui-accent-a700:#ffd600}
+.mdui-theme-accent-amber{--mdui-accent:#ffd740;--mdui-accent-a200:#ffd740;--mdui-accent-a100:#ffe57f;--mdui-accent-a400:#ffc400;--mdui-accent-a700:#ffab00}
+.mdui-theme-accent-orange{--mdui-accent:#ffab40;--mdui-accent-a200:#ffab40;--mdui-accent-a100:#ffd180;--mdui-accent-a400:#ff9100;--mdui-accent-a700:#ff6d00}
+.mdui-theme-accent-deep-orange{--mdui-accent:#ff6e40;--mdui-accent-a200:#ff6e40;--mdui-accent-a100:#ff9e80;--mdui-accent-a400:#ff3d00;--mdui-accent-a700:#dd2c00}
 
-    .mdui-theme-primary-@{colorName} when not (@colorName = null) {
-      .def-degree(@counter-degree) when (@counter-degree > 0) {
-        .def-degree((@counter-degree - 1));
-        @degree: extract(@globalPrimaryColorDegrees, @counter-degree);
-        @bg: 'color-@{colorName}-@{degree}';
-        @dark: 'color-@{colorName}-@{degree}-is-dark';
-        --mdui-primary-@{degree}: @@bg;
-        & when (@@dark = true) {
-          --mdui-primary-@{degree}-text: @color-white-text;
-        }
-        & when (@@dark = false) {
-          --mdui-primary-@{degree}-text: @color-black-text;
-        }
-      }
-      .def-degree(@global-primary-color-degrees-length);
-    }
-  }
-  .loop-primary-theme(@global-primary-colors-length);
-
-  .loop-accent-theme(@counter-color) when (@counter-color > 0) {
-    .loop-accent-theme((@counter-color - 1));
-    @colorName: extract(@globalAccentColors, @counter-color);
-
-    .mdui-theme-accent-@{colorName} when not (@colorName = null) {
-      @a100: 'color-@{colorName}-a100';
-      @a200: 'color-@{colorName}-a200';
-      @a400: 'color-@{colorName}-a400';
-      @a700: 'color-@{colorName}-a700';
-      @dark: 'color-@{colorName}-a200-is-dark';
-      --mdui-accent: @@a200;
-      --mdui-accent-text: @color-white-text;
-      & when (@@dark = true) {
-        --mdui-accent-text: @color-white-text;
-      }
-      & when (@@dark = false) {
-        --mdui-accent-text: @color-black-text;
-      }
-      --mdui-accent-a100: @@a100;
-      --mdui-accent-a200: @@a200;
-      --mdui-accent-a400: @@a400;
-      --mdui-accent-a700: @@a700;
-      --mdui-accent-a700-87: rgba(red(@@a700), green(@@a700), blue(@@a700), .87);
-    }
-  }
-  .loop-accent-theme(@global-accent-colors-length);
-}
-
-// 主题工具类: 单份规则 + var 引用
-.mdui-color-theme {
-  background-color: var(--mdui-primary-500) !important;
-  color: var(--mdui-primary-500-text) !important;
-}
-.mdui-color-theme-50 { background-color: var(--mdui-primary-50) !important; color: var(--mdui-primary-50-text) !important; }
-.mdui-color-theme-100 { background-color: var(--mdui-primary-100) !important; color: var(--mdui-primary-100-text) !important; }
-.mdui-color-theme-200 { background-color: var(--mdui-primary-200) !important; color: var(--mdui-primary-200-text) !important; }
-.mdui-color-theme-300 { background-color: var(--mdui-primary-300) !important; color: var(--mdui-primary-300-text) !important; }
-.mdui-color-theme-400 { background-color: var(--mdui-primary-400) !important; color: var(--mdui-primary-400-text) !important; }
-.mdui-color-theme-500 { background-color: var(--mdui-primary-500) !important; color: var(--mdui-primary-500-text) !important; }
-.mdui-color-theme-600 { background-color: var(--mdui-primary-600) !important; color: var(--mdui-primary-600-text) !important; }
-.mdui-color-theme-700 { background-color: var(--mdui-primary-700) !important; color: var(--mdui-primary-700-text) !important; }
-.mdui-color-theme-800 { background-color: var(--mdui-primary-800) !important; color: var(--mdui-primary-800-text) !important; }
-.mdui-color-theme-900 { background-color: var(--mdui-primary-900) !important; color: var(--mdui-primary-900-text) !important; }
-.mdui-color-theme-accent {
-  background-color: var(--mdui-accent) !important;
-  color: var(--mdui-accent-text) !important;
-}
-
-
+.mdui-color-theme-500{background-color:var(--mdui-primary-500)!important;color:var(--mdui-primary-500-text)!important}.mdui-color-theme-accent{background-color:var(--mdui-accent)!important;color:var(--mdui-accent-text,var(--mdui-accent))!important}.mdui-color-theme-a100{background-color:var(--mdui-accent-a100)!important;color:var(--mdui-accent-a100,var(--mdui-accent-a100))!important}.mdui-color-theme-a400{background-color:var(--mdui-accent-a400)!important;color:var(--mdui-accent-a400,var(--mdui-accent-a400))!important}.mdui-color-theme-a700{background-color:var(--mdui-accent-a700)!important;color:var(--mdui-accent-a700,var(--mdui-accent-a700))!important}
 /**
  * .mdui-color-[color]
  * .mdui-color-[color]-[degree]
@@ -179,75 +145,13 @@
 
 
 /**
- * .mdui-theme-primary-[color] .mdui-text-color-theme
- * .mdui-theme-primary-[color] .mdui-text-color-theme-[degree]
+ * primary 文本色工具类 (var 层)
  */
-
-& {
-  .loop-primary-theme(@counter-color) when (@counter-color > 0) {
-    .loop-primary-theme((@counter-color - 1));
-
-    @colorName: extract(@globalPrimaryColors, @counter-color);
-
-    .mdui-theme-primary-@{colorName} when not (@colorName = null) {
-
-      // .mdui-theme-primary-[color] .mdui-text-color-theme
-      .mdui-text-color-theme {
-        .mdui-text-color(@colorName) !important;
-      }
-
-      .loop-primary-degree-theme(@counter-degree) when (@counter-degree > 0) {
-        .loop-primary-degree-theme((@counter-degree - 1));
-
-        @degree: extract(@globalPrimaryColorDegrees, @counter-degree);
-
-        // .mdui-theme-primary-[color] .mdui-text-color-theme-[degree]
-        .mdui-text-color-theme-@{degree} when not (@degree = null) {
-          .mdui-text-color(@colorName, @degree) !important;
-        }
-      }
-      .loop-primary-degree-theme(@global-primary-color-degrees-length);
-    }
-  }
-  .loop-primary-theme(@global-primary-colors-length);
-}
-
-
+.mdui-text-color-theme{color:var(--mdui-primary-500)!important}.mdui-text-color-theme-50{color:var(--mdui-primary-50)!important}.mdui-text-color-theme-100{color:var(--mdui-primary-100)!important}.mdui-text-color-theme-200{color:var(--mdui-primary-200)!important}.mdui-text-color-theme-300{color:var(--mdui-primary-300)!important}.mdui-text-color-theme-400{color:var(--mdui-primary-400)!important}.mdui-text-color-theme-600{color:var(--mdui-primary-600)!important}.mdui-text-color-theme-700{color:var(--mdui-primary-700)!important}.mdui-text-color-theme-800{color:var(--mdui-primary-800)!important}.mdui-text-color-theme-900{color:var(--mdui-primary-900)!important}
 /**
- * .mdui-theme-accent-[color] .mdui-text-color-theme-accent
- * .mdui-theme-accent-[color] .mdui-text-color-theme-[degree]
+ * accent 文本色工具类 (var 层)
  */
-
-& {
-  .loop-accent-theme(@counter-color) when (@counter-color > 0) {
-    .loop-accent-theme((@counter-color - 1));
-
-    @colorName: extract(@globalAccentColors, @counter-color);
-
-    .mdui-theme-accent-@{colorName} when not (@colorName = null) {
-
-      // .mdui-theme-accent-[color] .mdui-text-color-theme-accent
-      .mdui-text-color-theme-accent {
-        .mdui-text-color(@colorName, a200) !important;
-      }
-
-      .loop-accent-degree-theme(@counter-degree) when (@counter-degree > 0) {
-        .loop-accent-degree-theme((@counter-degree - 1));
-
-        @degree: extract(@globalAccentColorDegrees, @counter-degree);
-
-        // .mdui-theme-accent-[color] .mdui-text-color-theme-[degree]
-        .mdui-text-color-theme-@{degree} when not (@degree = null) {
-          .mdui-text-color(@colorName, @degree) !important;
-        }
-      }
-      .loop-accent-degree-theme(@global-accent-color-degrees-length);
-    }
-  }
-  .loop-accent-theme(@global-accent-colors-length);
-}
-
-
+.mdui-text-color-theme-accent{color:var(--mdui-accent)!important}.mdui-text-color-theme-a100{color:var(--mdui-accent-a100)!important}.mdui-text-color-theme-a200{color:var(--mdui-accent-a200)!important}.mdui-text-color-theme-a400{color:var(--mdui-accent-a400)!important}.mdui-text-color-theme-a700{color:var(--mdui-accent-a700)!important}
 /**
  * .mdui-text-color-[color]
  * .mdui-text-color-[color]-[degree]
@@ -399,3 +303,8 @@
     color: @color-white-icon-disabled !important;
   }
 });
+
+// 别名与常用度数补充
+.mdui-text-color-primary { color: var(--mdui-primary-500) !important; }
+.mdui-text-color-theme-500 { color: var(--mdui-primary-500) !important; }
+.mdui-color-theme-a200 { background-color: var(--mdui-accent-a200) !important; color: var(--mdui-accent-text, var(--mdui-accent-text)) !important; }

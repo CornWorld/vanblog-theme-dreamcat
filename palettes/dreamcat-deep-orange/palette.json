@@ -1,0 +1,8 @@
+{
+  "name": "dreamcat-deep-orange",
+  "label": "DreamCat · Deep Orange",
+  "type": "light",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 主色调 deep-orange(Material #ff5722), MDUI 灰底观感; 由 themes/dreamcat/scripts/gen-palettes.mjs 生成"
+}

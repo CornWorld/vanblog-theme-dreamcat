@@ -1,0 +1,8 @@
+{
+  "name": "dreamcat-purple",
+  "label": "DreamCat · Purple",
+  "type": "light",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 主色调 purple(Material #9c27b0), MDUI 灰底观感; 由 themes/dreamcat/scripts/gen-palettes.mjs 生成"
+}

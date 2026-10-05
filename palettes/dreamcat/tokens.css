@@ -1,0 +1,11 @@
+/* DreamCat 经典亮色调色盘
+ * 来源: DreamCat Typecho 2.x 的 MDUI 默认观感 (mdui-theme-primary-indigo,
+ * 页面底 grey-100)。6 原子 token 契约见 hooks/palettes/README.md。 */
+:root {
+  --color-bg: #ffffff;          /* mdui 默认纯白页面背景(v2 实测 body #fff) */
+  --color-surface: #ffffff;     /* 卡片表面 */
+  --color-text: #212121;        /* MDUI grey-900 主文字 */
+  --color-text-muted: #757575;  /* MDUI grey-600 次要文字 */
+  --color-border: #e0e0e0;      /* MDUI grey-300 边框 */
+  --color-accent: #3f51b5;      /* Material indigo-500 主色 */
+}

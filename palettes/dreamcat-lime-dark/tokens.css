@@ -1,0 +1,9 @@
+/* DreamCat · Lime(暗色)— 生成文件,勿手改;源: themes/dreamcat/scripts/gen-palettes.mjs */
+html.dark {
+  --color-bg-dark: #303030;
+  --color-surface-dark: #424242;
+  --color-text-dark: #eeeeee;
+  --color-text-muted-dark: #9e9e9e;
+  --color-border-dark: #575759;
+  --color-accent-dark: #e6ee9c;
+}

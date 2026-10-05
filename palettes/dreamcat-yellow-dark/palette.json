@@ -1,0 +1,8 @@
+{
+  "name": "dreamcat-yellow-dark",
+  "label": "DreamCat · Yellow · 暗",
+  "type": "dark",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 主色调 yellow(暗色 Material #fff59d), MDUI 暗色规范; 由 themes/dreamcat/scripts/gen-palettes.mjs 生成"
+}

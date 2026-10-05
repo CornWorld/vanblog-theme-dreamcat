@@ -9,7 +9,11 @@ post 页上叠卡(作者头 + 五色条 + 时间/字数/浏览 chips + detail-in
 页脚「关于 DreamCat」弹窗。3.x master 独有的 toolbar/sidebar/img-header
 未纳入(避免混代)。
 
-交互行为层使用 [`@vanblog/mdui-lite`](../../packages/mdui-lite)(mdui 1.0.2 的 DreamCat 裁剪 fork,MIT):drawer/dialog/snackbar/ripple 四类原语由其提供,`dc-*` CSS 只做品牌皮肤;裁剪范围与维护章程见该包 README。
+交互行为层使用 **mdui-lite**(mdui 1.0.2 的 DreamCat 裁剪 fork,MIT,位于本仓库 `mdui-lite/`):drawer/dialog/snackbar/ripple 等原语由其提供,`dc-*` CSS 只做品牌皮肤;裁剪范围与维护章程见 `mdui-lite/README.md`。
+
+**本仓库自包含**:`mdui-lite/`(交互层包)与 `palettes/`(38 套调色盘数据)随本仓库分发, 不依赖 vanblog 主仓内容。部署时:
+- 主题: `vanblog.sh pack theme install <本仓库构建产物>` 或后台安装
+- 调色盘: `palettes/` 拷入数据目录并设 `VANBLOG_PALETTES_DIR`(或拷入镜像内置目录)
 
 视觉承接 **2.x LTS 经典版**(抽屉导航 / 大圆角软阴影卡片 / 五色装饰条 / 时间轴),工程上承接 **3.x 的现代化成果**(CSS token 化 / 目录树 / 代码复制 / 图片灯箱),并完成两件 Typecho 版没做的事:
 

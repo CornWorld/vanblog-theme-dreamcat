@@ -1,0 +1,8 @@
+{
+  "name": "dreamcat-pink",
+  "label": "DreamCat · Pink",
+  "type": "light",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 主色调 pink(Material #e91e63), MDUI 灰底观感; 由 themes/dreamcat/scripts/gen-palettes.mjs 生成"
+}

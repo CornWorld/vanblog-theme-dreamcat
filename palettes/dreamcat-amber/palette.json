@@ -1,0 +1,8 @@
+{
+  "name": "dreamcat-amber",
+  "label": "DreamCat · Amber",
+  "type": "light",
+  "version": "1.0.0",
+  "author": "LychApe / CornWorld",
+  "description": "DreamCat 主色调 amber(Material #ffc107), MDUI 灰底观感; 由 themes/dreamcat/scripts/gen-palettes.mjs 生成"
+}

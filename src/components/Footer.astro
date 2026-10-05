@@ -30,7 +30,7 @@ const yearRange = sinceYear && sinceYear < year ? `${sinceYear} - ` : "";
       )
     }
     {footerText && <p class="dc-footer-line">{footerText}</p>}
-    <button class="dc-footer-about mdui-ripple" data-dc-about>关于 DreamCat</button>
+    <button class="dc-footer-about mdui-ripple" mdui-dialog="{target: '#dc-about-dreamcat'}">关于 DreamCat</button>
   </div>
 </footer>
 
@@ -58,12 +58,3 @@ const yearRange = sinceYear && sinceYear < year ? `${sinceYear} - ` : "";
   </div>
 </div>
 
-<script>
-  // 关于弹窗(页脚按钮 → mdui Dialog;内联脚本经 window.mdui)
-  document.addEventListener("click", (e) => {
-    const t = e.target as HTMLElement;
-    if (!t.closest?.("[data-dc-about]") || !window.mdui) return;
-    const el = document.getElementById("dc-about-dreamcat");
-    if (el) new window.mdui.Dialog(el, { history: false }).open();
-  });
-</script>

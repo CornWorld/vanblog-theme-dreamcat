@@ -46,7 +46,7 @@ const customNav = (site?.nav ?? []).map((n) => ({
 ---
 
 <div class="mc-drawer mdui-drawer mdui-drawer-left" id="dc-drawer">
-  <div class="mdui-list DreamCat-List-01">
+  <nav class="mdui-list DreamCat-List-01" aria-label="站点导航">
     <!-- 品牌卡(v2 原结构:menu-bg 横图 + covered 站名条 + 头像叠出) -->
     <div class="mdui-card DreamCat-List-02" style="overflow: inherit;">
       <div class="DreamCat-menu-bg" style={brandStyle}>
@@ -195,7 +195,7 @@ const customNav = (site?.nav ?? []).map((n) => ({
         </div>
       </li>
     </a>
-  </div>
+  </nav>
 </div>
 
 <script>

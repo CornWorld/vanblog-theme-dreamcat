@@ -179,10 +179,10 @@ const accentNames = Object.keys(ACCENT_COLORS);
     let dialog = null;
     const open = () => {
       if (!dialogEl) return;
-      // mdui.Dialog 由 BaseLayout 的 module script 挂到 window(时序晚于本内联脚本,
-      // 但 open 只在用户点击后发生)
+      // mdui 1.x 对话框是元素级单例状态机: 重复 new 会多实例打架,
+      // 实例缓存到元素上, 只构造一次
       if (!dialog && window.mdui) {
-        dialog = new window.mdui.Dialog(dialogEl, { history: false });
+        dialog = dialogEl._dcDialog ?? (dialogEl._dcDialog = new window.mdui.Dialog(dialogEl, { history: false }));
       }
       dialog ? dialog.open() : dialogEl.classList.add("mdui-dialog-open");
       syncActive();

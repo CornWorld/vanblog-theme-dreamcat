@@ -148,6 +148,15 @@ const accentNames = Object.keys(ACCENT_COLORS);
       }
     };
 
+    // v2 body-class 机制: 主色/强调色 body 类驱动 mdui-lite --mdui-* 变量层
+    const applyBodyClasses = () => {
+      const { key, dark } = parseName(currentPalette());
+      const body = document.body;
+      Object.keys(colorHexes).forEach((k) => body.classList.toggle("mdui-theme-primary-" + k, k === key));
+      const a = accent();
+      Object.keys(accentMap).forEach((k) => body.classList.toggle("mdui-theme-accent-" + k, k === a));
+    };
+
     // 弹窗选项高亮
     const syncActive = () => {
       const cur = currentPalette();
@@ -162,6 +171,7 @@ const accentNames = Object.keys(ACCENT_COLORS);
       document.querySelectorAll("[data-dc-mode]").forEach((el) => {
         el.classList.toggle("is-active", el.dataset.dcMode === mode);
       });
+      applyBodyClasses();
     };
 
     // ── 交互(弹层 = mdui.Dialog,由 BaseLayout 挂到 window.mdui) ──

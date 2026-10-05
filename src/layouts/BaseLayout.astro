@@ -202,6 +202,19 @@ const websiteSchema = {
   </head>
 
   <body>
+    <!-- v2 body-class 机制移植: 访客选定的主色/强调色 → mdui-theme-* 类,
+         驱动 mdui-lite 的 --mdui-* 变量层(组件着色/工具类跟随) -->
+    <script is:inline>
+      (() => {
+        try {
+          const s = JSON.parse(localStorage.getItem("dreamcat-theme-settings") || "{}") || {};
+          const PRIMARY = {amber:1,blue:1,"blue-grey":1,brown:1,cyan:1,"deep-orange":1,"deep-purple":1,green:1,grey:1,indigo:1,"light-blue":1,"light-green":1,lime:1,orange:1,pink:1,purple:1,red:1,teal:1,yellow:1};
+          const ACCENT = {amber:1,blue:1,cyan:1,"deep-orange":1,"deep-purple":1,green:1,indigo:1,"light-blue":1,"light-green":1,lime:1,orange:1,pink:1,purple:1,red:1,teal:1,yellow:1};
+          if (s.primary && PRIMARY[s.primary]) document.body.classList.add("mdui-theme-primary-" + s.primary);
+          if (s.accent && ACCENT[s.accent]) document.body.classList.add("mdui-theme-accent-" + s.accent);
+        } catch {}
+      })();
+    </script>
     <div class="dc-shell">
       <Drawer
         site={site ?? {}}

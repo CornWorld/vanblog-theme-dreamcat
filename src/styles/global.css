@@ -84,6 +84,10 @@ html.dc-font-system {
 }
 
 /* ── 语义 token(暗色) ─────────────────────────────────── */
+html.dark body {
+  --dc-primary: var(--mdui-primary-300, var(--color-accent-dark, #7986cb));
+  --dc-pink: var(--mdui-accent-a200, #ff80ab);
+}
 /* 核心 6 别名必须显式重映射到 -dark 原子变量:调色盘的 dark token 是独立的
    --color-*-dark 名字,:root 里的 var(--color-bg) 不会自动跟着 html.dark 翻转。 */
 html.dark {
@@ -92,7 +96,6 @@ html.dark {
   --dc-text: var(--color-text-dark, #eeeeee);
   --dc-text-muted: var(--color-text-muted-dark, #9e9e9e);
   --dc-border: var(--color-border-dark, #575759);
-  --dc-primary: var(--color-accent-dark, #7986cb);
   --dc-surface-muted: color-mix(in srgb, var(--color-text-dark, #eeeeee) 6%, var(--color-surface-dark, #424242));
   --dc-soft: color-mix(in srgb, var(--color-accent-dark, #7986cb) 16%, var(--color-surface-dark, #424242));
   --dc-on-primary: #ffffff;
@@ -123,6 +126,12 @@ body {
   min-height: 100vh;
   background: var(--dc-bg);
   color: var(--dc-text);
+  /* 主色/强调色映射到 mdui-lite 变量层(声明在 body 上才能看见
+     body.mdui-theme-* 类注入的变量; 回落平台调色盘) */
+  --dc-primary: var(--mdui-primary-500, var(--color-accent, #3f51b5));
+  --dc-on-primary: var(--mdui-primary-500-text, #ffffff);
+  --dc-pink: var(--mdui-accent-a200, #ff4081);
+  --dc-on-accent: var(--mdui-accent-a200-text, #ffffff);
   font-family: var(--dc-font-body,
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
       "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif);
@@ -1990,7 +1999,19 @@ html.dark .dc-code pre code span {
   margin: 10px 0 4px;
 }
 
-/* ── mdui 组件表面主题化(主题层覆盖;fork 保持逐字对齐上游) ── */
+/* ── mdui 组件表面主题化(主题层覆盖;fork 保持逐字对齐上游) ──
+   着色对齐 mdui-lite var 名(交接清单: tab-active/select-selected/snackbar-action) */
+.mdui-tab-active {
+  color: var(--mdui-primary-500, #3f51b5);
+}
+
+.mdui-select-selected {
+  color: var(--mdui-primary-500-text, inherit);
+}
+
+.mdui-snackbar-action {
+  color: var(--mdui-accent-a200, #ff80ab);
+}
 .mdui-dialog {
   background-color: var(--dc-surface);
   color: var(--dc-text);

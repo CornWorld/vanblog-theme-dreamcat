@@ -30,7 +30,7 @@ const {
 } = Astro.props;
 
 const siteName = site?.siteName || "DreamCat";
-const avatar = site?.authorLogo || site?.siteLogo || "/img/default-avatar.png";
+const avatar = site?.authorLogo || site?.siteLogo || `${__VANBLOG_THEME_PREFIX__}/img/default-avatar.png`;
 const brandStyle = drawerBgUrl
   ? `background: url('${drawerBgUrl}')`
   : "background: url('/img/brand.jpg')";

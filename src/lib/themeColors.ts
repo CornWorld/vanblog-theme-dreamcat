@@ -20,9 +20,6 @@ export interface PrimaryColor {
   on: string;
 }
 
-export const PRIMARY_COLORS_T: Record<string, PrimaryColor> = PRIMARY_COLORS;
-export const ACCENT_COLORS_T: Record<string, string> = ACCENT_COLORS;
-
 /** 强调色作背景(FAB 等)时,其上图标的颜色。 */
 export function accentOnColor(name: string): string {
   return onColor(ACCENT_COLORS[name] ?? "#ffffff");

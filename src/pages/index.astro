@@ -33,7 +33,7 @@ const authorCoverUrl = sStr("authorCoverUrl");
 
 const siteName = site?.siteName || "DreamCat";
 const siteDesc = site?.siteDesc || "";
-const avatar = site?.authorLogo || site?.siteLogo || "";
+const avatar = site?.authorLogo || site?.siteLogo || `${__VANBLOG_THEME_PREFIX__}/img/default-avatar.png`;
 
 // timershaft_opt:A 说说 / B 日志 / C 公告 / D 状态(原版首页时间轴卡)
 const TIMERSHAFT_NAMES: Record<string, string> = { A: "说 说", B: "日 志", C: "公 告", D: "状 态" };
@@ -48,7 +48,7 @@ for (const p of posts) {
 
 <BaseLayout title="" path="/" site={site ?? {}}>
   <!-- 标题带(原版 DreamCat-content-header,indigo) -->
-  <div class="dreamcat-content-header">
+  <div class="DreamCat-content-header">
     <div class="dc-container">
       <h1 class="dreamcat-title">{siteName}</h1>
       <h5 class="dreamcat-subtitle">{siteDesc}</h5>

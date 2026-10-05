@@ -6,6 +6,8 @@
 // 其结构样式须先于主题皮肤加载,dc-* 在其上做品牌视觉。
 import "@vanblog/mdui-lite/dist/mdui-lite.css";
 import "../styles/global.css";
+// v2 经典样式(原版 style.css 逐字移植)最后加载, 原类名规则生效
+import "../styles/v2-classic.css";
 // KaTeX CSS — 隐藏 rehype-katex 在视觉 HTML 旁输出的 MathML aria-hidden 副本,
 // 缺了它含公式的文章会显示两份数学式。正文在服务端渲染,故全局加载。
 import "katex/dist/katex.css";

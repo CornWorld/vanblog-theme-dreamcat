@@ -76,8 +76,26 @@
 .DreamCat-content-header {
   min-height: 50px;
   padding: 35px 50px 35px 80px;
+  /* v2 原版由 mdui-color-indigo 类供底色; 裁剪版改为 token 化(跟随调色盘) */
+  background-color: var(--dc-primary);
   color: #fff;
   text-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+}
+
+/* 标题/副标题: v2 无独立样式, 白字继承 + mdui h1 语义(34px/400) */
+.DreamCat-content-header .dreamcat-title {
+  margin: 0;
+  color: rgb(255 255 255 / 89%);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.DreamCat-content-header .dreamcat-subtitle {
+  margin: 8px 0 0;
+  color: rgb(255 255 255 / 82%);
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .DreamCat-footer {
@@ -344,4 +362,15 @@
 
 .doc-footer-nav-left .doc-footer-nav-chapter {
   margin-left: 34px;
+}
+
+/* ── 移植补充: 文章页纯色带高度(post.php min-height 140) ── */
+.DreamCat-content-header--band {
+  min-height: 140px;
+  padding: 0;
+}
+
+.moe-page-div .is-disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }

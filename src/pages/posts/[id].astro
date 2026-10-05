@@ -88,7 +88,6 @@ const sBool = (key: string, fallback = true) =>
 const showToc = sBool("showToc");
 const showLightbox = sBool("showLightbox");
 const showClickHearts = sBool("showClickHearts", false);
-const showListCover = sBool("showListCover");
 
 // 上下篇(created 相邻,与 Typecho 版语义一致)
 let prePost: { id: string; title: string } | null = null;
@@ -155,15 +154,15 @@ const cover = postMetaString(data?.meta, "cover", "image", "ogImage");
     data && (safeHtml !== null || locked) ? (
       <>
         <!-- 主色带(原版 post.php:min-height 140px 纯色) -->
-        <div class="dreamcat-content-header dreamcat-content-header--band" />
+        <div class="DreamCat-content-header DreamCat-content-header--band" />
 
         <div class="dc-container">
           <!-- 内容卡上叠(原版 margin-top -15%,radius 9px) -->
           <article class="dc-card dc-card--lg dreamcat-post-card">
             <!-- 作者卡头(原版 mdui-card-header:头像 + 作者名 + 站点简介) -->
             <header class="dreamcat-post-author">
-              {site?.authorLogo || site?.siteLogo ? (
-                <img class="dreamcat-post-author-avatar" src={site?.authorLogo || site?.siteLogo} alt={authorName || siteName} />
+              {site?.authorLogo || site?.siteLogo || `${__VANBLOG_THEME_PREFIX__}/img/default-avatar.png` ? (
+                <img class="dreamcat-post-author-avatar" src={site?.authorLogo || site?.siteLogo || `${__VANBLOG_THEME_PREFIX__}/img/default-avatar.png`} alt={authorName || siteName} />
               ) : (
                 <span class="dreamcat-post-author-avatar dc-avatar-ph">
                   <Icon name="person" size={26} />

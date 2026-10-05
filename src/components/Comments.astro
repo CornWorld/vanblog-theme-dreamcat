@@ -15,7 +15,7 @@ const provider = site?.commentsProvider;
 const cfg = (site?.commentsConfig ?? {}) as { server?: string; site?: string };
 const server = provider === "artalk" ? (cfg.server || "").trim() : "";
 const siteName = cfg.site || site?.siteName || "VanBlog";
-const enabled = provider !== "disabled";
+const enabled = provider === "artalk"; // external: 用户脚本自管 DOM, 主题不渲染空壳
 ---
 
 {

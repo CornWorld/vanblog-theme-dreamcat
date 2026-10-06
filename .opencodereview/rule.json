@@ -1,0 +1,24 @@
+{
+  "rules": [
+    {
+      "path": "src/**/*.astro",
+      "rule": "DreamCat Astro 版主题 (vanblog 主题形态, PHP 版的移植). 强制执行:\n\n- 安全域: 页面/组件渲染用户内容 (评论/文章正文/作者名) 必须走 Astro 的自动转义; set:html 只允许用于站点管理员可控内容 (正文经平台消毒管线后), 禁止对评论者可控数据使用 set:html (XSS)。\n- 解锁/密码语义必须服务端执行: 前端可达的数据形态 (API 响应字段) 禁止用于权限判断; 密码类端点失败必须限速, 无 oracle (不存在/未发布/无密码统一 404)。\n- 品牌对齐: 视觉与 PHP 版 (CornWorld/DreamCat) 保持一致; CSS 变量沿用 --mdui-primary-*/--mdui-accent* (mdui-lite 调色板层) 与 --dreamcat-* 主题变量, 新增硬编码色值需注释理由。\n- 组件边界: 页面级数据获取在 frontmatter (服务端), 交互状态在客户端 script; is:inline 脚本要注明原因。\n- TS 严格性: frontmatter 里的 props/data 结构变化要核对全部引用组件; Astro.check 通过后再提交。",
+      "merge_system_rule": true
+    },
+    {
+      "path": "src/**/*.ts",
+      "rule": "主题 TS 层 (config/middleware/工具)。强制执行:\n- middleware 的鉴权/可见性逻辑是安全边界: 可见性过滤禁止手写旁路, 复用统一表达式。\n- 配置默认值方向: 安全相关开关默认开启 (CSP/消毒), 功能开关默认关闭。\n- 死导出/未使用类型及时清理 (本仓历史提交有先例)。",
+      "merge_system_rule": true
+    },
+    {
+      "path": "mdui-lite/**",
+      "rule": "仓内自包含的 mdui-lite 源 (裁剪自 mdui 1.0.2, MIT)。强制执行:\n- 规范源在 vanblog/packages/mdui-lite: 本目录是从 8d02066 快照复制的发布件, 修改应先落在规范源再同步, 直接改本目录会造成漂移 (发现漂移即报)。\n- 调色板循环保持 var 输出架构: 禁止回退到 19 色全量矩阵展开。\n- material-icons @font-face 归主题持有, 本目录不含字体声明。",
+      "merge_system_rule": true
+    },
+    {
+      "path": "src/styles/*.css",
+      "rule": "主题样式层。强制执行:\n- global.css 与 v2-classic.css 的导入顺序敏感 (v2-classic 后置覆盖, 本仓历史事故: 顺序错误导致被忽略)。\n- mdui-lite.css 为构建产物禁止手改。\n- prefers-reduced-motion / focus-visible 已是既有 a11y 基线, 新交互组件不得回退。",
+      "merge_system_rule": true
+    }
+  ]
+}

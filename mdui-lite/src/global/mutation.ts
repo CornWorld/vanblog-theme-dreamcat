@@ -32,6 +32,6 @@ mdui.mutation = function (selector?: string, apiInit?: TYPE_API_INIT): void {
     return;
   }
 
-  entries[selector] = apiInit!;
+  entries[selector] = apiInit;
   $(selector).each((i, element) => mutation(selector, apiInit, i, element));
 };

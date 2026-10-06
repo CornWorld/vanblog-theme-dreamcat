@@ -27,6 +27,7 @@ import './components/table';
 import './components/panel';
 import './components/panel/customAttr';
 import './components/headroom';
+import './components/appbar';
 import './components/headroom/customAttr';
 import './components/tab';
 import './components/tab/customAttr';

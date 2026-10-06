@@ -3,7 +3,7 @@
   "version": "1.0.2-dreamcat.1",
   "private": true,
   "type": "module",
-  "description": "mdui 1.0.2 的 DreamCat 裁剪 fork: 只保留 drawer/dialog/snackbar/ripple/collapse 五个交互件。上游 mdui 1.x 已冻结, 本包按维护章程自养。",
+  "description": "mdui 1.0.2 的 DreamCat 裁剪 fork: 保留主题在用的交互件与结构样式, 颜色矩阵改写为 CSS 变量层。上游 mdui 1.x 已冻结, 本包按维护章程自养。",
   "license": "MIT",
   "main": "./dist/mdui-lite.js",
   "exports": {

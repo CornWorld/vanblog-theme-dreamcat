@@ -27,7 +27,9 @@ SOFTWARE.
 NOTICE(裁剪说明):
 
 本包是 mdui v1.0.2 (https://github.com/zdhxiong/mdui/tree/v1.0.2) 的裁剪 fork,
-只保留 drawer / dialog / snackbar / ripple / collapse 五个交互件及其公共层
-(jq.ts / jq_extends / utils / global / styles 必需段 + button 样式依赖)。
-其余 21 个组件与颜色/图标/字体/栅格/排版样式被裁除。
+保留 DreamCat 主题在用的全部交互件 (drawer / dialog / snackbar / ripple / collapse / menu /
+textfield / headroom / tab / tooltip / select / slider / bottom_nav / table / panel /
+progress / spinner / selection_control 等约 17 个) 及其公共层与全部结构性样式段
+(栅格/排版/辅助/阴影/媒体), 交互注册清单以 src/index.ts 为准。
+裁掉的: 其余纯展示组件与颜色矩阵 (color.less 已改写为 CSS 变量层) / Roboto @font-face 外链。
 源文件除本入口(index.ts / index.less)与构建配置外均逐字保留自上游。
